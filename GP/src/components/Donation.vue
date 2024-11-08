@@ -22,6 +22,9 @@
   .donation {
     text-align: center;
   }
+  .buttons{
+    
+  }
   .buttons button {
     margin: 5px;
     padding: 10px;

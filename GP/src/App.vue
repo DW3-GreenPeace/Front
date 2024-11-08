@@ -9,6 +9,7 @@
     <Volunteer />
     <Location />
     <Footer />
+    <VolunteerForm />
   </div>
 </template>
 
@@ -22,6 +23,7 @@ import Partner from './components/Partner.vue'
 import Volunteer from './components/Volunteer.vue'
 import Location from './components/Location.vue'
 import Footer from './components/Footer.vue'
+import VolunteerForm from './components/VolunteerForm.vue'
 
 export default {
   components: {
@@ -33,7 +35,8 @@ export default {
     Partner,
     Volunteer,
     Location,
-    Footer
+    Footer,
+    VolunteerForm
   }
 }
 </script>
