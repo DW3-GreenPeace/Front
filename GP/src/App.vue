@@ -2,28 +2,20 @@
   <div id="app">
     <Header />
     <Banner />
-    <About />
-    <Themes />
-    <Donation />
-    <Partner />
-    <Volunteer />
-    <Location />
     <Footer />
-    <VolunteerForm />
   </div>
 </template>
 
 <script>
 import Header from './components/Header.vue'
-import Banner from './components/Banner.vue'
-import About from './components/About.vue'
-import Themes from './components/Themes.vue'
-import Donation from './components/Donation.vue'
-import Partner from './components/Partner.vue'
-import Volunteer from './components/Volunteer.vue'
-import Location from './components/Location.vue'
+import Banner from './pages/inicio/Banner.vue'
+import About from './pages/inicio/About.vue'
+import Themes from './pages/inicio/Themes.vue'
+import Donation from './pages/inicio/Donation.vue'
+import Partner from './pages/inicio/Partner.vue'
+import Volunteer from './pages/inicio/Volunteer.vue'
+import Location from './pages/inicio/Location.vue'
 import Footer from './components/Footer.vue'
-import VolunteerForm from './components/VolunteerForm.vue'
 
 export default {
   components: {
@@ -35,8 +27,7 @@ export default {
     Partner,
     Volunteer,
     Location,
-    Footer,
-    VolunteerForm
+    Footer
   }
 }
 </script>
