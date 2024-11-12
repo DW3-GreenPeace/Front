@@ -1,35 +1,15 @@
 <template>
   <div id="app">
-    <Header />
-    <Banner />
-    <Footer />
+    <router-view />
   </div>
 </template>
 
-<script>
-import Header from './components/Header.vue'
-import Banner from './pages/inicio/Banner.vue'
-import About from './pages/inicio/About.vue'
-import Themes from './pages/inicio/Themes.vue'
-import Donation from './pages/inicio/Donation.vue'
-import Partner from './pages/inicio/Partner.vue'
-import Volunteer from './pages/inicio/Volunteer.vue'
-import Location from './pages/inicio/Location.vue'
-import Footer from './components/Footer.vue'
+<script lang="ts">
+import { defineComponent } from 'vue';
 
-export default {
-  components: {
-    Header,
-    Banner,
-    About,
-    Themes,
-    Donation,
-    Partner,
-    Volunteer,
-    Location,
-    Footer
-  }
-}
+export default defineComponent({
+  name: 'App',
+})
 </script>
 
 <style>

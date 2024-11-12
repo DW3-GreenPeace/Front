@@ -1,6 +1,6 @@
 <template>
     <section class="banner">
-      <img src="../assets/LogoImgPalavra.png" alt="">
+      <img src="../../assets/LogoImgPalavra.png" alt="">
       
     </section>
   </template>

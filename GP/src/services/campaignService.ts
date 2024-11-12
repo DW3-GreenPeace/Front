@@ -8,6 +8,14 @@ let campaigns: Campaign[] = [
     startDate: "2024-06-01", 
     endDate: "2024-08-31", 
     volunteers: []
+  },
+  { 
+    id: 2, 
+    title: "Campanha de Inverno", 
+    description: "Campanha para arrecadar roupas e cobertores para o inverno", 
+    startDate: "2024-06-01", 
+    endDate: "2024-08-31", 
+    volunteers: []
   }
 ];
 

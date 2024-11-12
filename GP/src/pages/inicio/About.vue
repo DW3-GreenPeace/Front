@@ -3,7 +3,7 @@
         <h1>Quem Somos</h1>
         <h2>Conectamos Pessoas à Causa</h2>
         <div class="sobre">
-            <img src="../assets/quemsomos.png" alt="" class="img">
+            <img src="../../assets/quemsomos.png" alt="" class="img">
             <p>
                 A Greenpeace, conhecida por suas palestras envolventes em escolas públicas e privadas, tem em Marta uma aliada dedicada. Ela destaca a importância de abordar temas cruciais, como sustentabilidade, conservação da biodiversidade, ecologia urbana e a proteção dos oceanos. Marta acredita que a educação é a chave para mudanças significativas e está empenhada em levar essas mensagens vitais a alunos de todas as idades.
             </p>

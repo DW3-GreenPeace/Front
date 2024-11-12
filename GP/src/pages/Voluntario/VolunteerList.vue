@@ -29,7 +29,7 @@
       };
   
       const viewDetails = (id: number) => router.push(`/admin/volunteer/${id}`);
-      const addVolunteer = () => router.push(`/admin/volunteer/new`);
+      const addVolunteer = () => router.push(`/admin/volunteer/form`);
       const editVolunteer = (id: number) => router.push(`/admin/volunteer/edit/${id}`);
   
       const deleteVolunteerById = async (id: number) => {

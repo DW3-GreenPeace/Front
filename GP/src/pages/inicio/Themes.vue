@@ -10,40 +10,8 @@
                         ecológico não apenas sustenta a riqueza biológica, mas também promove a estabilidade ambiental,
                         criando um cenário propício para a prosperidade da vida em todas as suas formas.</p>
                 </div>
-                <img src="../assets/tema.png" alt="" class="img">
+                <img src="../../assets/tema.png" alt="" class="img">
             </div>
-            <div class="theme-item">
-
-                <img src="../assets/tema.png" alt="" class="img">
-                <div class="text">
-                    <h2>Conservação da Biodiversidade</h2>
-                    <p>É imperativo reconhecer a significativa relevância da preservação da diversidade de espécies e
-                        ecossistemas para assegurar a vitalidade e saúde do nosso planeta. A manutenção desse equilíbrio
-                        ecológico não apenas sustenta a riqueza biológica, mas também promove a estabilidade ambiental,
-                        criando um cenário propício para a prosperidade da vida em todas as suas formas.</p>
-                </div>
-            </div>
-            <div class="theme-item">
-                <div class="text">
-                    <h2>Conservação da Biodiversidade</h2>
-                    <p>É imperativo reconhecer a significativa relevância da preservação da diversidade de espécies e
-                        ecossistemas para assegurar a vitalidade e saúde do nosso planeta. A manutenção desse equilíbrio
-                        ecológico não apenas sustenta a riqueza biológica, mas também promove a estabilidade ambiental,
-                        criando um cenário propício para a prosperidade da vida em todas as suas formas.</p>
-                </div>
-                <img src="../assets/tema.png" alt="" class="img">
-            </div>
-            <div class="theme-item">
-                <img src="../assets/tema.png" alt="" class="img">
-                <div class="text">
-                    <h2>Conservação da Biodiversidade</h2>
-                    <p>É imperativo reconhecer a significativa relevância da preservação da diversidade de espécies e
-                        ecossistemas para assegurar a vitalidade e saúde do nosso planeta. A manutenção desse equilíbrio
-                        ecológico não apenas sustenta a riqueza biológica, mas também promove a estabilidade ambiental,
-                        criando um cenário propício para a prosperidade da vida em todas as suas formas.</p>
-                </div>
-            </div>
-
         </div>
     </section>
 </template>
