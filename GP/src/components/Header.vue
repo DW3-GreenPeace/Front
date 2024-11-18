@@ -5,7 +5,7 @@
       <ul>
         <RouterLink to="/" class="link" :class="{ active: activeLink === 'inicio' }" click="setActiveLink('inicio')">Início</RouterLink>
         <RouterLink to="/" class="link" :class="{ active: activeLink === '' }" click="setActiveLink('')">Sobre</RouterLink>
-        <RouterLink to="/campanha/details" class="link" :class="{ active: activeLink === '' }" click="setActiveLink('')">Campanha</RouterLink>
+        <RouterLink to="/campanha/list" class="link" :class="{ active: activeLink === '' }" click="setActiveLink('')">Campanha</RouterLink>
         <RouterLink to="" class="link" :class="{ active: activeLink === '' }" click="setActiveLink('')">Contato</RouterLink>
         <RouterLink to="/login" class="link" :class="{ active: activeLink === 'login' }" click="setActiveLink('')">Entrar</RouterLink>
       </ul>

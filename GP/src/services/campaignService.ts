@@ -5,14 +5,25 @@ let campaigns: Campaign[] = [
     id: 1, 
     title: "Campanha de Inverno", 
     description: "Campanha para arrecadar roupas e cobertores para o inverno", 
+    address: "Rua 1, 123",
     startDate: "2024-06-01", 
     endDate: "2024-08-31", 
     volunteers: []
   },
   { 
     id: 2, 
-    title: "Campanha de Inverno", 
+    title: "Campanha de Inverno",
     description: "Campanha para arrecadar roupas e cobertores para o inverno", 
+    address: "Rua 1, 123",
+    startDate: "2024-06-01", 
+    endDate: "2024-08-31", 
+    volunteers: []
+  },
+  { 
+    id: 3, 
+    title: "Campanha de Verão", 
+    description: "Campanha para arrecadar roupas e cobertores para o inverno", 
+    address: "Rua 1, 123",
     startDate: "2024-06-01", 
     endDate: "2024-08-31", 
     volunteers: []
@@ -36,4 +47,12 @@ export const updateCampaign = async (id: number, updatedCampaign: Campaign): Pro
 
 export const deleteCampaign = async (id: number): Promise<void> => {
   campaigns = campaigns.filter(camp => camp.id !== id);
+};
+
+// Função para adicionar voluntário à campanha
+export const joinCampaignById = async (id: number, volunteer: { id: number, name: string, email: string }): Promise<void> => {
+  const campaign = campaigns.find(camp => camp.id === id);
+  if (campaign && !campaign.volunteers.some(v => v.id === volunteer.id)) {
+    campaign.volunteers.push(volunteer);
+  }
 };

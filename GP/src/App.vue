@@ -17,8 +17,8 @@ export default defineComponent({
   margin: 0%;
   padding: 0%;
   box-sizing: border-box;
-  background-color: aliceblue;
-  width: auto;
+  background-color: rgb(255, 255, 255);
+  width: 100%;
   
 }
 

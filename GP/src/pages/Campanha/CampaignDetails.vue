@@ -1,5 +1,4 @@
 <template>
-    <Header />
     <div>
       <h2>Detalhes da Campanha</h2>
       <p><strong>Título:</strong> {{ campaign?.title }}</p>
@@ -23,13 +22,8 @@
   import { Campaign } from '../../types/campaign';
   import { getCampaignById } from '../../services/campaignService';
   import { useRoute, useRouter } from 'vue-router';
-  import Header from '../../components/Header.vue'
   
   export default defineComponent({
-
-    components: {
-      Header,
-    },
 
     setup() {
       const route = useRoute();

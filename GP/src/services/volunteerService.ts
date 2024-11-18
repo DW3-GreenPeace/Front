@@ -3,7 +3,7 @@ import { Volunteer } from '../types/volunteer';
 import { Campaign } from '../types/campaign'; // Certifique-se de que existe o tipo de Campaign importado
 
 let volunteers: Volunteer[] = [
-  { id: 1, name: "John Doe", age: 30, email: "john@example.com", skills: ["logistics"], availability: "weekends" },
+  { id: 1, name: "John Doe", age: 30, email: "john@example.com", cpf: "88888888",skills: ["logistics"], availability: "weekends" },
 ];
 
 let campaigns: Campaign[] = [
