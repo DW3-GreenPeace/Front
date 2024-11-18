@@ -1,58 +1,52 @@
+import axios from 'axios';
 import { Campaign } from '../types/campaign';
+import env from '../../env';
 
-let campaigns: Campaign[] = [
-  { 
-    id: 1, 
-    title: "Campanha de Inverno", 
-    description: "Campanha para arrecadar roupas e cobertores para o inverno", 
-    address: "Rua 1, 123",
-    startDate: "2024-06-01", 
-    endDate: "2024-08-31", 
-    volunteers: []
-  },
-  { 
-    id: 2, 
-    title: "Campanha de Inverno",
-    description: "Campanha para arrecadar roupas e cobertores para o inverno", 
-    address: "Rua 1, 123",
-    startDate: "2024-06-01", 
-    endDate: "2024-08-31", 
-    volunteers: []
-  },
-  { 
-    id: 3, 
-    title: "Campanha de Verão", 
-    description: "Campanha para arrecadar roupas e cobertores para o inverno", 
-    address: "Rua 1, 123",
-    startDate: "2024-06-01", 
-    endDate: "2024-08-31", 
-    volunteers: []
-  }
-];
+const BASE_URL = env.url.local + '/campaigns'; // Rota base para campanhas
 
-export const getCampaigns = async (): Promise<Campaign[]> => campaigns;
+// Obter todas as campanhas
+export const getCampaigns = async (): Promise<Campaign[]> => {
+  const response = await axios.get<Campaign[]>(BASE_URL);
+  return response.data;
+};
 
-export const getCampaignById = async (id: number): Promise<Campaign | undefined> => 
-  campaigns.find(camp => camp.id === id);
+// Obter campanha por ID
+export const getCampaignById = async (id: number): Promise<Campaign | undefined> => {
+  const response = await axios.get<Campaign>(`${BASE_URL}/${id}`);
+  return response.data;
+};
 
+// Criar nova campanha
 export const createCampaign = async (campaign: Campaign): Promise<void> => {
-  campaign.id = new Date().valueOf(); // Gerar ID único
-  campaigns.push(campaign);
+  await axios.post(BASE_URL, campaign, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 };
 
+// Atualizar campanha existente
 export const updateCampaign = async (id: number, updatedCampaign: Campaign): Promise<void> => {
-  const index = campaigns.findIndex(camp => camp.id === id);
-  if (index !== -1) campaigns[index] = updatedCampaign;
+  await axios.put(`${BASE_URL}/${id}`, updatedCampaign, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 };
 
+// Deletar campanha
 export const deleteCampaign = async (id: number): Promise<void> => {
-  campaigns = campaigns.filter(camp => camp.id !== id);
+  await axios.delete(`${BASE_URL}/${id}`);
 };
 
-// Função para adicionar voluntário à campanha
-export const joinCampaignById = async (id: number, volunteer: { id: number, name: string, email: string }): Promise<void> => {
-  const campaign = campaigns.find(camp => camp.id === id);
-  if (campaign && !campaign.volunteers.some(v => v.id === volunteer.id)) {
-    campaign.volunteers.push(volunteer);
-  }
+// Adicionar voluntário à campanha
+export const joinCampaignById = async (
+  id: number,
+  volunteer: { id: number; name: string; email: string }
+): Promise<void> => {
+  await axios.post(`${BASE_URL}/${id}/volunteers`, volunteer, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 };

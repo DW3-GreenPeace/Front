@@ -13,6 +13,8 @@ import VolunteerForm from '../pages/Voluntario/VolunteerForm.vue';
 import VolunteerList from '../pages/Voluntario/VolunteerList.vue';
 import VolunteerProfile from '../pages/Voluntario/VolunteerProfile.vue';
 import CampaingAll from '../pages/Campanha/CampaingAll.vue';
+import CampaignCreate from '../pages/Campanha/CampaignCreate.vue';
+
 import { isAuthenticated, isAdmin, isVolunteer } from '../services/authService';
 
 const routes: Array<RouteRecordRaw> = [
@@ -28,26 +30,26 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/admin',
     component: AdminPage,
-    // beforeEnter: (to, from, next) => {
-    //   if (isAuthenticated()) next();
-    //   else next('/login');
-    // },
+    beforeEnter: (to, from, next) => {
+      if (isAuthenticated()) next();
+      else next('/login');
+    },
   },
   {
     path: '/admin/dashboard',
     component: AdminDashboard,
-    // beforeEnter: (to, from, next) => {
-    //   if (isAuthenticated()) next();
-    //   else next('/login');
-    // },
+    beforeEnter: (to, from, next) => {
+      if (isAuthenticated()) next();
+      else next('/login');
+    },
   },
   {
     path: '/admin/relatorio',
     component: DonationReport,
-    // beforeEnter: (to, from, next) => {
-    //   if (isAuthenticated()) next();
-    //   else next('/login');
-    // },
+    beforeEnter: (to, from, next) => {
+      if (isAuthenticated() && isAdmin()) next();
+      else next('/login');
+    },
   },
 
   // Rotas protegidas da seção "Campanha" (apenas para administradores)
@@ -56,48 +58,48 @@ const routes: Array<RouteRecordRaw> = [
     component: CampaignDetails,
   },
   {
-    path: '/admin/campanha/form',
-    component: CampaignForm,
-    // beforeEnter: (to, from, next) => {
-    //   if (isAuthenticated() && isAdmin()) next();
-    //   else next('/login');
-    // },
+    path: '/admin/campanha/form/create',
+    component: CampaignCreate,
+    beforeEnter: (to, from, next) => {
+      if (isAuthenticated() && isAdmin()) next();
+      else next('/login');
+    },
   },
   {
     path: '/admin/campanha/list',
     component: CampaignList,
-    // beforeEnter: (to, from, next) => {
-    //   if (isAuthenticated() && isAdmin()) next();
-    //   else next('/login');
-    // },
+    beforeEnter: (to, from, next) => {
+      if (isAuthenticated() && isAdmin()) next();
+      else next('/login');
+    },
   },
   {
     path: '/campanha/list',
     component: CampaingAll,
-    // beforeEnter: (to, from, next) => {
-    //   if (isAuthenticated() && isAdmin()) next();
-    //   else next('/login');
-    // },
+    beforeEnter: (to, from, next) => {
+      if (isAuthenticated() && isAdmin()) next();
+      else next('/login');
+    },
   },
 
   // Rotas protegidas da seção "Voluntario" (apenas lista de voluntários para administradores)
   { 
     path: '/admin/volunteer/:id',
     component: VolunteerDetails,
-    // beforeEnter: (to, from, next) => {
-    //   if (isAuthenticated()) next();
-    //   else next('/login');
-    // },
-    // props: true,
+    beforeEnter: (to, from, next) => {
+      if (isAuthenticated()) next();
+      else next('/login');
+    },
+    props: true,
   },
   { 
     path: '/volunteer/perfil',
     component: VolunteerProfile,
-    // beforeEnter: (to, from, next) => {
-    //   if (isAuthenticated() && isVolunter()) next();
-    //   else next('/login');
-    // },
-    // props: true,
+    beforeEnter: (to, from, next) => {
+      if (isAuthenticated() && isVolunteer()) next();
+      else next('/login');
+    },
+    props: true,
   },
   {
     path: '/voluntario/form',
@@ -106,10 +108,10 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/admin/voluntario/list',
     component: VolunteerList,
-    // beforeEnter: (to, from, next) => {
-    //   if (isAuthenticated() && isAdmin()) next();
-    //   else next('/login');
-    // },
+    beforeEnter: (to, from, next) => {
+      if (isAuthenticated() && isAdmin()) next();
+      else next('/login');
+    },
   },
 ];
 

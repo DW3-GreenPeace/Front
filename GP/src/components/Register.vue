@@ -1,83 +1,94 @@
 <!-- Cadastro.vue -->
 <template>
   <div class="auth-container">
-    <div class="top">
-      <div class="logo-form">
+    <h3>Cadastro de Voluntário</h3>
+    <form @submit="handleSubmit" class="form">
+      <div class="input">
+        <div class="input-group">
+          <label for="name">name</label>
+          <input id="name" v-model="name" type="text" placeholder="Digite seu name" required />
+        </div>
+
+        <div class="input-group">
+          <label for="email">E-mail</label>
+          <input id="email" v-model="email" type="email" placeholder="Digite seu e-mail" required />
+        </div>
+        <div class="input-group">
+          <label for="senha">Senha</label>
+          <input id="senha" v-model="senha" type="password" placeholder="Digite sua senha" required />
+        </div>
       </div>
-      <h2>Cadastro Voluntário</h2>
-    </div>
-    <form class="register">
-      
-      <div class="inputone">
+      <div class="input">
+        <div class="input-group">
+          <label for="cpf">CPF</label>
+          <input id="cpf" v-model="cpf" type="text" placeholder="Digite seu CPF" maxlength="11" required />
+        </div>
+
+        <div class="input-group">
+          <label for="rg">RG</label>
+          <input id="rg" v-model="rg" type="text" placeholder="Digite seu RG" maxlength="11" required />
+        </div>
+
+        <div class="input-group">
+          <label for="telefone">Telefone</label>
+          <input id="telefone" v-model="telefone" type="text" placeholder="Digite seu telefone" required />
+        </div>
+      </div>
+      <div class="input">
+        <div class="input-group">
+          <label for="age">Idade</label>
+          <input id="age" v-model="age"  type="number" placeholder="Sua Idade" maxlength="2"
+            required />
+        </div>
+        <div class="input-group">
+          <label for="cep">CEP</label>
+          <input id="cep" v-model="cep" @input="handleCepChange" type="text" placeholder="Digite seu CEP" maxlength="8"
+            required />
+        </div>
+
+        <div class="input-group">
+          <label for="endereco">Rua</label>
+          <input id="endereco" v-model="endereco" type="text" readonly
+            placeholder="endereco será preenchida automaticamente" required />
+        </div>
+
+        
+      </div>
+      <div class="input">
+        <div class="input-group">
+          <label for="cidade">Cidade</label>
+          <input id="cidade" v-model="cidade" type="text" readonly placeholder="Cidade será preenchida automaticamente"
+            required />
+        </div>
+        <div class="input-group">
+          <label for="bairro">Bairro</label>
+          <input id="bairro" v-model="bairro" type="text" readonly placeholder="Bairro será preenchido automaticamente"
+            required />
+        </div>
+        <div class="input-group">
+          <label for="cidade">Número da Casa/Apartamento</label>
+          <input id="cidade" type="text" required />
+        </div>
+      </div>
 
       <div class="input-group">
-        <label for="">Nome</label>
-        <input type="text">
+        <label for="skills">Hablidades</label>
+        <input id="cidade" v-model="skills" type="text" placeholder="Exemplo: Comunicação, Liderança, etc"
+          required />
       </div>
-      <div class="input-group">
-          <label for="">Email</label>
-          <input type="text">
-        </div>
-      </div>
-      <div class="input">
-        
-        <div class="input-group">
-          <label for="">Data de Nascimento</label>
-          <input type="date">
-        </div>
-        <div class="input-group">
-          <label for="">CPF</label>
-          <input type="text">
-        </div>
-        <div class="input-group">
-          <label for="">RG</label>
-          <input type="text">
-        </div>
-      </div>
-      <div class="input">
-        
-        <div class="input-group">
-          <label for="">Telefone:</label>
-          <input type="text">
-        </div>
-        <div class="input-group">
-          <label for="">CEP</label>
-          <input type="text">
-        </div>
-        <div class="input-group">
-          <label for="">Rua</label>
-          <input type="text">
-        </div>
-        
-      </div>
-      <div class="input">
-        <div class="input-group">
-          <label for="">Número°</label>
-          <input type="text">
-        </div>
-        <div class="input-group">
-          <label for="">Bairro</label>
-          <input type="text">
-        </div>
-        <div class="input-group">
-          <label for="">Cidade</label>
-          <input type="text">
-        </div>
-      </div>
-      <div class="input-group">
-          <label for="">Habilidades:</label>
-          <input type="text">
-        </div>
-      <button type="submit" class="btn-cadastro">
-        Cadastrar
+      <p class="mensagem" v-if="mensagem">{{ mensagem }}</p>
+      <button type="submit" :disabled="carregando" class="btn-cadastro">
+        {{ carregando ? "Cadastrando..." : "Cadastrar" }}
       </button>
     </form>
+
     <div class="login">
-        <p>Já possui conta? Clique abaixo</p>
-        <button class="login-btn">
-          Ir para Login
-        </button>
-      </div>
+      <p>Já tem Conta? Clique abaixo</p>
+      <button class="login-btn" @click="login">
+       <p>Login</p> 
+      </button>
+
+    </div>
   </div>
 </template>
 
@@ -86,117 +97,140 @@ import { defineComponent, ref } from 'vue';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { useRouter } from 'vue-router';
-// import env from '../../env.js';
+import env from '../../env';
 
 export default defineComponent({
-  // setup() {
-  //   const formData = ref({
-  //     nome: '',
-  //     email: '',
-  //     senha: '',
-  //     cep: '',
-  //     rua: '',
-  //     bairro: '',
-  //     cidade: '',
-  //     cpf: '',
-  //     rg: '',
-  //     telefone: '',
-  //   });
+  setup() {
+    const name = ref('');
+    const email = ref('');
+    const senha = ref('');
+    const cep = ref('');
+    const endereco = ref('');
+    const age = ref('');
+    const bairro = ref('');
+    const cidade = ref('');
+    const cpf = ref('');
+    const rg = ref('');
+    const telefone = ref('');
+    const skills = ref('');
+    const mensagem = ref('');
+    const carregando = ref(false);
 
-  //   const fields = [
-  //     { name: "nome", label: "Nome", type: "text" },
-  //     { name: "email", label: "Email", type: "email" },
-  //     { name: "senha", label: "Senha", type: "password" },
-  //     { name: "cep", label: "CEP", type: "text", placeholder: "Somente números", maxLength: 8 },
-  //     { name: "rua", label: "Rua", type: "text", disabled: true, placeholder: "Digite seu CEP" },
-  //     { name: "bairro", label: "Bairro", type: "text", disabled: true, placeholder: "Digite seu CEP" },
-  //     { name: "cidade", label: "Cidade", type: "text", disabled: true, placeholder: "Digite seu CEP" },
-  //     { name: "cpf", label: "CPF", type: "text", maxLength: 11, placeholder: "Apenas números" },
-  //     { name: "rg", label: "RG", type: "text", maxLength: 9, placeholder: "Apenas números" },
-  //     { name: "telefone", label: "Telefone", type: "text", maxLength: 11, placeholder: "Apenas números" },
-  //   ];
+    const router = useRouter();
 
-  //   const carregando = ref(false);
-  //   const mensagem = ref('');
-  //   const router = useRouter();
+    const buscarEndereco = async (cep: string) => {
+      try {
+        const resposta = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
+        if (resposta.data.erro) {
+          mensagem.value = 'CEP não encontrado.';
+          endereco.value = '';
+          bairro.value = '';
+          cidade.value = '';
+        } else {
+          endereco.value = resposta.data.logradouro;
+          bairro.value = resposta.data.bairro;
+          cidade.value = resposta.data.localidade;
+          mensagem.value = '';
+        }
+      } catch (error) {
+        mensagem.value = 'Erro ao buscar o CEP.';
+        console.error('Erro ao buscar CEP:', error);
+      }
+    };
 
-  //   const buscarEndereco = async (cep: string) => {
-  //     try {
-  //       const resposta = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
-  //       if (resposta.data.erro) {
-  //         mensagem.value = 'CEP não encontrado.';
-  //         formData.value.rua = '';
-  //         formData.value.bairro = '';
-  //         formData.value.cidade = '';
-  //       } else {
-  //         formData.value.rua = resposta.data.logradouro;
-  //         formData.value.bairro = resposta.data.bairro;
-  //         formData.value.cidade = resposta.data.localidade;
-  //         mensagem.value = '';
-  //       }
-  //     } catch (error) {
-  //       mensagem.value = 'Erro ao buscar o CEP.';
-  //       console.error('Erro ao buscar CEP:', error);
-  //     }
-  //   };
+    const handleCepChange = (e: Event) => {
+      const valorCep = (e.target as HTMLInputElement).value.replace(/\D/g, '');
+      cep.value = valorCep;
 
-  //   const handleCepChange = (e: Event) => {
-  //     const valorCep = (e.target as HTMLInputElement).value.replace(/\D/g, '');
-  //     formData.value.cep = valorCep;
-  //     if (valorCep.length === 8) {
-  //       buscarEndereco(valorCep);
-  //     } else {
-  //       formData.value.rua = '';
-  //       formData.value.bairro = '';
-  //       formData.value.cidade = '';
-  //     }
-  //   };
+      if (valorCep.length === 8) {
+        buscarEndereco(valorCep);
+      } else {
+        endereco.value = '';
+        bairro.value = '';
+        cidade.value = '';
+      }
+    };
 
-  //   const handleSubmit = async () => {
-  //     if (!Object.values(formData.value).every((field) => field)) {
-  //       mensagem.value = 'Por favor, preencha todos os campos.';
-  //       return;
-  //     }
+    const handleSubmit = async (e: Event) => {
+      e.preventDefault();
+      if (!name.value || !email.value || !senha.value || !cep.value || !endereco.value || !bairro.value || !cidade.value || !cpf.value || !rg.value || !telefone.value || !skills.value) {
+        mensagem.value = 'Por favor, preencha todos os campos.';
+        return;
+      }
 
-  //     const dadosUsuario = { ...formData.value, adm: 0, id_paroquia: null };
-  //     carregando.value = true;
-  //     mensagem.value = '';
+      const dadosUsuario = {
+        name: name.value,
+        cpf: cpf.value,
+        rg: rg.value,
+        endereco: endereco.value,
+        age: age.value,
+        email: email.value,
+        skills: skills.value,
+        // senha: senha.value,
+        // telefone: telefone.value,
+      };
 
-  //     try {
-  //       const resposta = await axios.post(`${env.url.local}/user/register`, dadosUsuario);
-  //       if (resposta.data.status) {
-  //         Swal.fire({
-  //           title: 'Sucesso!',
-  //           text: 'Cadastro Feito com Sucesso!',
-  //           icon: 'success',
-  //           confirmButtonText: 'Ok',
-  //         }).then((result) => {
-  //           if (result.isConfirmed) router.push('/login');
-  //         });
-  //       } else {
-  //         mensagem.value = resposta.data.message;
-  //       }
-  //     } catch (error) {
-  //       if (error.response) {
-  //         mensagem.value = `Erro: ${error.response.data.message}`;
-  //       } else {
-  //         mensagem.value = `Erro de conexão: ${error.message}`;
-  //       }
-  //       console.error('Erro:', error);
-  //     } finally {
-  //       carregando.value = false;
-  //     }
-  //   };
+      carregando.value = true;
+      mensagem.value = '';
 
-  //   return {
-  //     formData,
-  //     fields,
-  //     carregando,
-  //     mensagem,
-  //     handleCepChange,
-  //     handleSubmit,
-  //   };
-  // },
+      try {
+        const resposta = await axios.post(env.url.local + '/volunteers', dadosUsuario,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            mode: 'cors',
+          }
+        );
+
+        if (resposta.data.status === true) {
+          Swal.fire({
+            title: 'Sucesso!',
+            text: 'Cadastro Feito com Sucesso!',
+            icon: 'success',
+            confirmButtonText: 'Ok',
+          }).then((result) => {
+            if (result.isConfirmed) {
+              router.push('/login');
+            }
+          });
+        } else {
+          mensagem.value = resposta.data.message;
+        }
+      } catch (error: any) {
+        if (error.response) {
+          mensagem.value = `Erro: ${error.response.data.message}`;
+        } else {
+          mensagem.value = `Erro de conexão: ${error.message}`;
+        }
+        console.error('Erro:', error);
+      } finally {
+        carregando.value = false;
+      }
+    };
+    const login = async () => {
+      router.push("/login")
+    }
+    return {
+      name,
+      email,
+      senha,
+      age,
+      cep,
+      endereco,
+      bairro,
+      cidade,
+      cpf,
+      rg,
+      telefone,
+      skills,
+      login,
+      mensagem,
+      carregando,
+      handleSubmit,
+      handleCepChange,
+    };
+  },
 });
 </script>
 
@@ -236,12 +270,13 @@ label {
   margin-bottom: 0.5rem;
 }
 
-  .input, .inputone {
-    width: 96%;
-    display: flex;
-    justify-content: space-between;
-    text-align: left;
-  }
+.input,
+.inputone {
+  width: 96%;
+  display: flex;
+  justify-content: space-between;
+  text-align: left;
+}
 
 .input .input-group {
   width: 30%;
@@ -317,7 +352,10 @@ h2 {
 }
 
 .login {
-  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
 
 .login-btn {
@@ -328,6 +366,11 @@ h2 {
   cursor: pointer;
   border: 1px solid #ccc;
   border-radius: 4px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20%;
 }
 
 .login-btn:hover {

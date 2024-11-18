@@ -1,36 +1,39 @@
-// volunteerService.ts
+import axios from 'axios';
 import { Volunteer } from '../types/volunteer';
-import { Campaign } from '../types/campaign'; // Certifique-se de que existe o tipo de Campaign importado
+import { Campaign } from '../types/campaign';
+import env from '../../env';
 
-let volunteers: Volunteer[] = [
-  { id: 1, name: "John Doe", age: 30, email: "john@example.com", cpf: "88888888",skills: ["logistics"], availability: "weekends" },
-];
+const BASE_URL = env.url.local + '/volunteers'; // Rota base para voluntários
 
-let campaigns: Campaign[] = [
-  { id: 1, title: "Campanha de Doação", description: "Ajude-nos a arrecadar alimentos.", startDate: "2024-01-10", endDate: "2024-01-30", volunteers: [1] },
-  { id: 2, title: "Campanha de Limpeza", description: "Participe da limpeza do parque.", startDate: "2024-02-15", endDate: "2024-02-20", volunteers: [] },
-];
+// Obter todos os voluntários
+export const getVolunteers = async (): Promise<Volunteer[]> => {
+  const response = await axios.get<Volunteer[]>(BASE_URL);
+  return response.data;
+};
 
-export const getVolunteers = async (): Promise<Volunteer[]> => volunteers;
+// Obter voluntário por ID
+export const getVolunteerById = async (id: number): Promise<Volunteer | undefined> => {
+  const response = await axios.get<Volunteer>(`${BASE_URL}/${id}`);
+  return response.data;
+};
 
-export const getVolunteerById = async (id: number): Promise<Volunteer | undefined> =>
-  volunteers.find(vol => vol.id === id);
-
+// Criar novo voluntário
 export const createVolunteer = async (volunteer: Volunteer): Promise<void> => {
-  volunteer.id = new Date().valueOf(); // Gerar ID único
-  volunteers.push(volunteer);
+  await axios.post(BASE_URL, volunteer);
 };
 
+// Atualizar voluntário existente
 export const updateVolunteer = async (id: number, updatedVolunteer: Volunteer): Promise<void> => {
-  const index = volunteers.findIndex(vol => vol.id === id);
-  if (index !== -1) volunteers[index] = updatedVolunteer;
+  await axios.put(`${BASE_URL}/${id}`, updatedVolunteer);
 };
 
+// Deletar voluntário
 export const deleteVolunteer = async (id: number): Promise<void> => {
-  volunteers = volunteers.filter(vol => vol.id !== id);
+  await axios.delete(`${BASE_URL}/${id}`);
 };
 
-// Nova função para obter as campanhas nas quais o voluntário está inscrito
+// Obter campanhas nas quais o voluntário está inscrito
 export const getVolunteerCampaigns = async (volunteerId: number): Promise<Campaign[]> => {
-  return campaigns.filter(campaign => campaign.volunteers.includes(volunteerId));
+  const response = await axios.get<Campaign[]>(`${BASE_URL}/${volunteerId}/campaigns`);
+  return response.data;
 };

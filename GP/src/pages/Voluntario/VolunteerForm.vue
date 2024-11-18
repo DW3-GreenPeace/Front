@@ -181,7 +181,7 @@ export default defineComponent({
       mensagem.value = '';
 
       try {
-        const resposta = await axios.post(env.url.local + '/user/register', dadosUsuario);
+        const resposta = await axios.post(env.url.local + '/volunteers', dadosUsuario);
 
         if (resposta.data.status === true) {
           Swal.fire({
