@@ -7,6 +7,7 @@
       <h2>Login</h2>
     </div>
     <!-- <p v-if="mensagem" class="mensagem">{{ mensagem }}</p> -->
+    <form class="form-login" @click="handleSubmit">
       <div class="input-group">
         <label>Email:</label>
         <input
