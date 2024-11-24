@@ -10,27 +10,27 @@
   
   <script lang="ts">
   import { defineComponent } from 'vue';
-  import { logout, isAuthenticated } from '../../services/authService';
+  // import { logout, isAuthenticated } from '../../services/authService';
   import { useRouter } from 'vue-router';
   import AdminDashboard from '../Adm/AdminDashboard.vue';
   import DonationReport from './DonationReport.vue';
   
   export default defineComponent({
     components: { AdminDashboard, DonationReport },
-    // setup() {
-    //   const router = useRouter();
+    setup() {
+      const router = useRouter();
   
-    //   if (!isAuthenticated()) {
-    //     router.push('/login');
-    //   }
+      // if (!isAuthenticated()) {
+      //   router.push('/login');
+      // }
   
-    //   const handleLogout = () => {
-    //     logout();
-    //     router.push('/login');
-    //   };
+      const handleLogout = () => {
+        // logout();
+        router.push('/login');
+      };
   
-    //   return { handleLogout };
-    // }
+      return { handleLogout };
+    }
   });
   </script>
   

@@ -31,13 +31,13 @@
 
         <div class="input-group">
           <label for="telefone">Telefone</label>
-          <input id="telefone" v-model="telefone" type="text" placeholder="Digite seu telefone" required />
+          <input id="telefone" v-model="telefone" type="text" placeholder="Digite seu telefone" maxlength="11" required />
         </div>
       </div>
       <div class="input">
         <div class="input-group">
           <label for="age">Idade</label>
-          <input id="age" v-model="age"  type="number" placeholder="Sua Idade" maxlength="2"
+          <input id="age" v-model="age"  type="date" placeholder="Sua Idade" maxlength="2"
             required />
         </div>
         <div class="input-group">
@@ -151,63 +151,95 @@ export default defineComponent({
       }
     };
 
-    const handleSubmit = async (e: Event) => {
-      e.preventDefault();
-      if (!name.value || !email.value || !senha.value || !cep.value || !endereco.value || !bairro.value || !cidade.value || !cpf.value || !rg.value || !telefone.value || !skills.value) {
-        mensagem.value = 'Por favor, preencha todos os campos.';
-        return;
-      }
+    const calcularIdade = (dataNascimento: string): number => {
+  const hoje = new Date();
+  const nascimento = new Date(dataNascimento);
 
-      const dadosUsuario = {
-        name: name.value,
-        cpf: cpf.value,
-        rg: rg.value,
-        endereco: endereco.value,
-        age: age.value,
-        email: email.value,
-        skills: skills.value,
-        // senha: senha.value,
-        // telefone: telefone.value,
-      };
+  let idade = hoje.getFullYear() - nascimento.getFullYear();
+  const mesAtual = hoje.getMonth();
+  const diaAtual = hoje.getDate();
 
-      carregando.value = true;
-      mensagem.value = '';
+  const mesNascimento = nascimento.getMonth();
+  const diaNascimento = nascimento.getDate();
 
-      try {
-        const resposta = await axios.post(env.url.local + '/volunteers', dadosUsuario,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            mode: 'cors',
-          }
-        );
+  // Ajusta a idade se o mês/dia de aniversário ainda não foi alcançado este ano
+  if (mesAtual < mesNascimento || (mesAtual === mesNascimento && diaAtual < diaNascimento)) {
+    idade--;
+  }
 
-        if (resposta.data.status === true) {
-          Swal.fire({
-            title: 'Sucesso!',
-            text: 'Cadastro Feito com Sucesso!',
-            icon: 'success',
-            confirmButtonText: 'Ok',
-          }).then((result) => {
-            if (result.isConfirmed) {
-              router.push('/login');
-            }
-          });
-        } else {
-          mensagem.value = resposta.data.message;
+  return idade;
+};
+
+const handleSubmit = async (e: Event) => {
+  e.preventDefault();
+
+  if (!age.value) {
+    mensagem.value = "Por favor, insira sua data de nascimento.";
+    return;
+  }
+
+  const idade = calcularIdade(age.value);
+
+  if (idade < 18) {
+    mensagem.value = "Você deve ter pelo menos 18 anos para se cadastrar.";
+    return;
+  }
+
+  if (!name.value || !email.value || !senha.value || !cep.value || !endereco.value || !bairro.value || !cidade.value || !cpf.value || !rg.value || !telefone.value || !skills.value) {
+    mensagem.value = 'Por favor, preencha todos os campos.';
+    return;
+  }
+
+  const dadosUsuario = {
+    name: name.value,
+    cpf: cpf.value,
+    password: senha.value,
+    rg: rg.value,
+    endereco: endereco.value,
+    birth: age.value,
+    email: email.value,
+    phone: telefone.value,
+    skills: skills.value.split(',').map(skill => skill.trim()), // Conversão para array
+  };
+
+  carregando.value = true;
+  mensagem.value = '';
+
+  try {
+    const resposta = await axios.post(env.url.local + '/volunteers', dadosUsuario, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      mode: 'cors',
+    });
+
+    if (resposta.data.status === true) {
+      Swal.fire({
+        title: 'Sucesso!',
+        text: 'Cadastro Feito com Sucesso!',
+        icon: 'success',
+        confirmButtonText: 'Ok',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          router.push('/login');
         }
-      } catch (error: any) {
-        if (error.response) {
-          mensagem.value = `Erro: ${error.response.data.message}`;
-        } else {
-          mensagem.value = `Erro de conexão: ${error.message}`;
-        }
-        console.error('Erro:', error);
-      } finally {
-        carregando.value = false;
-      }
-    };
+      });
+    } else {
+      mensagem.value = resposta.data.message;
+    }
+  } catch (error: any) {
+    if (error.response) {
+      mensagem.value = `Erro: ${error.response.data.message}`;
+    } else {
+      mensagem.value = `Erro de conexão: ${error.message}`;
+    }
+    console.error('Erro:', error);
+  } finally {
+    carregando.value = false;
+  }
+};
+
+
     const login = async () => {
       router.push("/login")
     }
@@ -251,7 +283,7 @@ label {
   margin: 0 auto;
   padding: 20px;
   background-color: #fff;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); */
   border-radius: 8px;
   text-align: center;
   height: 92dvh;
@@ -321,7 +353,7 @@ h2 {
 .btn-cadastro {
   width: 100%;
   padding: 0.8rem;
-  background-color: #6c63ff;
+  background-color: #07a50f;
   color: #fff;
   font-size: 1rem;
   font-weight: bold;
@@ -332,7 +364,7 @@ h2 {
 }
 
 .btn-cadastro:hover {
-  background-color: #5752c9;
+  background-color: #0e9419;
 }
 
 .mensagem {

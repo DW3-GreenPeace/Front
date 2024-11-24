@@ -1,22 +1,45 @@
 <template>
     <section class="about">
-        <h1>Quem Somos</h1>
-        <h2>Conectamos Pessoas à Causa</h2>
-        <div class="sobre">
-            <img src="../../assets/quemsomos.png" alt="" class="img">
-            <p>
-                A Greenpeace, conhecida por suas palestras envolventes em escolas públicas e privadas, tem em Marta uma aliada dedicada. Ela destaca a importância de abordar temas cruciais, como sustentabilidade, conservação da biodiversidade, ecologia urbana e a proteção dos oceanos. Marta acredita que a educação é a chave para mudanças significativas e está empenhada em levar essas mensagens vitais a alunos de todas as idades.
-            </p>
-        </div>
-
+      <h1>Quem Somos</h1>
+      <h2>Conectamos Pessoas à Causa</h2>
+      <div class="sobre">
+        <img v-if="aboutImage" :src="aboutImage" alt="Sobre nós" class="img" />
+        <p v-if="aboutText">{{ aboutText }}</p>
+        <p v-else>Carregando informações...</p>
+      </div>
     </section>
-</template>
-
-<script>
-export default {
-    name: 'About'
-}
-</script>
+  </template>
+  
+  <script>
+  import axios from "axios";
+  import env from "../../../env"; // Substitua pelo caminho do seu arquivo de configuração
+  
+  export default {
+    name: "About",
+    data() {
+      return {
+        aboutText: "", // Armazena o texto recuperado da API
+        aboutImage: "", // Armazena a URL da imagem recuperada da API
+      };
+    },
+    async created() {
+      try {
+        const response = await axios.get(`${env.url.local}/about`, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+  
+        // Atualiza os dados recuperados da API
+        this.aboutText = response.data.text || "Conteúdo não disponível no momento.";
+        this.aboutImage = response.data.image || ""; // Espera um campo "image" na resposta da API
+      } catch (error) {
+        console.error("Erro ao carregar informações:", error);
+        this.aboutText = "Erro ao carregar informações sobre quem somos.";
+      }
+    },
+  };
+  </script>
 
 <style scoped>
 .about {

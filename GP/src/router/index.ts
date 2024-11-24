@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 import Login from '../components/Login.vue';
 import AdminPage from '../pages/Adm/AdminPage.vue';
 import AdminDashboard from '../pages/Adm/AdminDashboard.vue';
@@ -14,110 +14,91 @@ import VolunteerList from '../pages/Voluntario/VolunteerList.vue';
 import VolunteerProfile from '../pages/Voluntario/VolunteerProfile.vue';
 import CampaingAll from '../pages/Campanha/CampaingAll.vue';
 import CampaignCreate from '../pages/Campanha/CampaignCreate.vue';
+import CreateDonations from '../pages/Donations/CreateDonations.vue';
+import QuemSomosList from '../pages/Adm/Site/QuemSomos/QuemSomosList.vue';
+import TemasList from '../pages/Adm/Site/Temas/TemasList.vue';
+import InicioVolunter from '../pages/inicio/InicioVolunter.vue';
 
-import { isAuthenticated, isAdmin, isVolunteer } from '../services/authService';
+const isAuthenticated = (): boolean => !!localStorage.getItem('usuario');
+const isAdmin = (): boolean => {
+  const userData = localStorage.getItem('usuario');
+  return userData ? JSON.parse(userData).adm : false;
+};
 
-const routes: Array<RouteRecordRaw> = [
-  // Rota de Login
-  { path: '/login', component: Login },
 
-  {path: '/register', component: Register},
+const routes = [
+  // Rotas públicas
+  { path: '/', name: 'Inicio', component: Inicio },
+  { path: '/campanhas', name: 'Campanhas', component: CampaingAll },
+  { path: '/login', name: 'Login', component: Login },
+  { path: '/register', name: 'Register', component: Register },
 
-  // Rota da página inicial (acesso público)
-  { path: '/', component: Inicio },
+  { path: '/donationslist', name: 'DonationReport', component: DonationReport },
 
-  // Rotas protegidas da seção "Adm"
+  { path: '/campaigns', name: 'CampaignList', component: CampaignList },
+  // Rotas de perfil do voluntário
+  {
+    path: '/volunteer/profile',
+    name: 'VolunteerProfile',
+    component: VolunteerProfile,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/inicio/volunteer',
+    name: 'VolunteerInicio',
+    component: InicioVolunter,
+    // meta: { requiresAuth: true },
+  },
+
+  // Rotas do administrador
   {
     path: '/admin',
+    name: 'AdminPage',
     component: AdminPage,
-    beforeEnter: (to, from, next) => {
-      if (isAuthenticated()) next();
-      else next('/login');
-    },
-  },
-  {
-    path: '/admin/dashboard',
-    component: AdminDashboard,
-    beforeEnter: (to, from, next) => {
-      if (isAuthenticated()) next();
-      else next('/login');
-    },
-  },
-  {
-    path: '/admin/relatorio',
-    component: DonationReport,
-    beforeEnter: (to, from, next) => {
-      if (isAuthenticated() && isAdmin()) next();
-      else next('/login');
-    },
+    // meta: { requiresAuth: true, requiresAdmin: true },
+    children: [
+      { path: 'dashboard', name: 'AdminDashboard', component: AdminDashboard },
+      // { path: 'donations', name: 'DonationReport', component: DonationReport },
+      { path: 'quem-somos', name: 'QuemSomosList', component: QuemSomosList },
+      { path: 'temas', name: 'TemasList', component: TemasList },
+    ],
   },
 
-  // Rotas protegidas da seção "Campanha" (apenas para administradores)
-  {
-    path: '/campanha/details/:id',
-    component: CampaignDetails,
-  },
-  {
-    path: '/admin/campanha/form/create',
-    component: CampaignCreate,
-    beforeEnter: (to, from, next) => {
-      if (isAuthenticated() && isAdmin()) next();
-      else next('/login');
-    },
-  },
-  {
-    path: '/admin/campanha/list',
-    component: CampaignList,
-    beforeEnter: (to, from, next) => {
-      if (isAuthenticated() && isAdmin()) next();
-      else next('/login');
-    },
-  },
-  {
-    path: '/campanha/list',
-    component: CampaingAll,
-    beforeEnter: (to, from, next) => {
-      if (isAuthenticated() && isAdmin()) next();
-      else next('/login');
-    },
-  },
+  // Rotas de campanhas
+  // { path: '/campaigns', name: 'CampaignList', component: CampaignList, meta: { requiresAuth: true } },
+  { path: '/campaigns/:id', name: 'CampaignDetails', component: CampaignDetails, meta: { requiresAuth: true } },
+  { path: '/campaigns/form', name: 'CampaignForm', component: CampaignForm, meta: { requiresAuth: true, requiresAdmin: true } },
+  { path: '/campaigns/create', name: 'CampaignCreate', component: CampaignCreate, meta: { requiresAuth: true, requiresAdmin: true } },
 
-  // Rotas protegidas da seção "Voluntario" (apenas lista de voluntários para administradores)
-  { 
-    path: '/admin/volunteer/:id',
-    component: VolunteerDetails,
-    beforeEnter: (to, from, next) => {
-      if (isAuthenticated()) next();
-      else next('/login');
-    },
-    props: true,
-  },
-  { 
-    path: '/volunteer/perfil',
-    component: VolunteerProfile,
-    beforeEnter: (to, from, next) => {
-      if (isAuthenticated() && isVolunteer()) next();
-      else next('/login');
-    },
-    props: true,
-  },
-  {
-    path: '/voluntario/form',
-    component: VolunteerForm,
-  },
-  {
-    path: '/admin/voluntario/list',
-    component: VolunteerList,
-    beforeEnter: (to, from, next) => {
-      if (isAuthenticated() && isAdmin()) next();
-      else next('/login');
-    },
-  },
+  // Rotas de voluntários
+  { path: '/volunteers', name: 'VolunteerList', component: VolunteerList, meta: { requiresAuth: true, requiresAdmin: true } },
+  { path: '/volunteers/:id', name: 'VolunteerDetails', component: VolunteerDetails, meta: { requiresAuth: true, requiresAdmin: true } },
+  { path: '/volunteers/form', name: 'VolunteerForm', component: VolunteerForm, meta: { requiresAuth: true, requiresAdmin: true } },
+
+  // Rotas de doações
+  { path: '/donations/create', name: 'CreateDonations', component: CreateDonations, meta: { requiresAuth: true } },
+
+  // Página 404 para rotas não encontradas
+  // { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('../pages/NotFound.vue') },
 ];
 
+// Criando o roteador
 const router = createRouter({
   history: createWebHistory(),
   routes,
+});
+
+// Proteção de rotas
+router.beforeEach((to, from, next) => {
+  if (to.meta.requiresAuth && !isAuthenticated()) {
+    alert('Você precisa estar logado para acessar esta página.');
+    next({ name: 'Login' });
+  } else if (to.meta.requiresAdmin && !isAdmin()) {
+    alert('Acesso restrito para administradores.');
+    next({ name: 'Inicio' });
+  } else {
+    next();
+  }
 });
 
 export default router;

@@ -64,7 +64,7 @@ export default defineComponent({
             mensagem.value = "";
 
             try {
-                const response = await axios.post(`${env.url.local}/campaigns`, newCampaign, {
+                const response = await axios.post(  env.url.local + '/campaigns', newCampaign, {
                     headers: {
                         "Content-Type": "application/json",
                     },

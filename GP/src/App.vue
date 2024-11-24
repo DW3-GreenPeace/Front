@@ -6,7 +6,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-
+import './Global.css'
 export default defineComponent({
   name: 'App',
 })
@@ -24,5 +24,11 @@ export default defineComponent({
 
 p, h3, h2, h1{
   color: black;
+}
+
+body{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 </style>

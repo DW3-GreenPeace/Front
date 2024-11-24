@@ -1,6 +1,6 @@
 const env = {
     "url":{
-        "local": "https://fd2c-2804-7f0-a218-d3e-f4c1-3124-bc7f-52d0.ngrok-free.app",
+        "local": "https://9d18-2804-7f0-a218-202e-2834-55d1-fe38-3a40.ngrok-free.app/api",
         "prod": ""
     },
     "credentials":{

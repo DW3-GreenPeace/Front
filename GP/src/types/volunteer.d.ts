@@ -2,9 +2,11 @@ export interface Volunteer {
     id: number;
     name: string;
     cpf: string;
-    rg:number;
+    rg:string;
     endereco: string;
-    age: number;
+    birth: Date;
+    password: string;
     email: string;
+    phone: string;
     skills: string[];
   }

@@ -25,28 +25,14 @@ export default defineComponent({
   },
   setup() {
     // Recupera os dados do localStorage sem converter para JSON novamente
-    const userData = localStorage.getItem("usuario");
-    const user = ref(userData || null); // Atribui diretamente
-
-    // Define o tipo do header com base no papel do usuário
-    const which = ref(
-      user.value?.role === "adm"
-        ? "adm"
-        : user.value?.role === "usuario"
-        ? "usuario"
-        : ""
-    );
-
-    return {
-      which,
-    };
+    
   },
 });
 </script>
 
 <template>
   <div>
-    <Header :which="which" />
+    <Header which = 'usuario'/>
     <Banner />
     <About />
     <Themes />

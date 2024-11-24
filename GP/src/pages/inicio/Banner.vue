@@ -1,8 +1,7 @@
 <template>
-    <section class="banner">
+    <div class="banner">
       <img src="../../assets/LogoImgPalavra.png" alt="">
-      
-    </section>
+    </div>
   </template>
   
   <script>
@@ -13,10 +12,11 @@
   
   <style scoped>
   .banner {
-    height: 100dvh;
-    background-image: url(../assets/Banner.png);
+    height: 75dvh;
+    background-image: url(../../assets/Banner.png);
     background-size: cover;
     background-repeat: none;
+    background-position: center;
     display: flex;
     align-items: center;
     justify-content: center;

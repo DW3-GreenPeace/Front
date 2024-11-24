@@ -1,6 +1,6 @@
 export interface Donation {
     id: number;
     nameDonor: string;
-    date: string;
+    date: Date;
     donation: number;
   }

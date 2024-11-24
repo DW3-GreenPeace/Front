@@ -4,12 +4,11 @@
       <div class="title">
         <h1>Campanha Disponiveis</h1>
         <p>Caso não apareca nenhum botão para participar da campanha, se cadastre como volutário
-          <router-link to="/register">
-              Clique aqui
-          </router-link>
+          <!-- <a href="/register">Clique Aqui</a> -->
           ou entra com sua conta
         </p>
       </div>
+      
       
       
     <div class="campaign-list">
@@ -31,7 +30,7 @@
   import { defineComponent, ref, onMounted, computed } from 'vue';
   import { Campaign } from '../../types/campaign';
   import { getCampaigns, joinCampaignById } from '../../services/campaignService';
-  import { isAuthenticated, isVolunteer } from '../../services/authService';
+  // import isAuthenticated from '../../services/authService'
   import Header from '../../components/Header.vue';
   
   export default defineComponent({
