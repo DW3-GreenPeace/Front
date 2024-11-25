@@ -10,6 +10,7 @@ import Partner from "./Partner.vue";
 import Themes from "./Themes.vue";
 import Volunteer from "./Volunteer.vue";
 
+
 export default defineComponent({
   name: "Inicio",
   components: {

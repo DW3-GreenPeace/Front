@@ -1,101 +1,200 @@
 <template>
-    <div class="container">
-      <h1>Gerenciar Quem Somos</h1>
-      <div class="add-voltar">
-        <button class="btn-add" @click="abrirForm()">Adicionar</button>
-        <button class="btn-back" @click="backAdmin()">Voltar Para a Administração</button>
-      </div>
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Texto</th>
-            <th>Imagem</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="item in quemSomos" :key="item.id">
-            <td>{{ item.texto }}</td>
-            <td><img :src="item.img" alt="Imagem" width="150" /></td>
-            <td class="acoes">
-              <button class="btn-editar" @click="editarItem(item)">Editar</button>
-              <button class="btn-excluir" @click="excluirItem(item.id)">Excluir</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      
-      <QuemSomosForm 
-        v-if="exibirForm" 
-        :itemEditar="itemEditar" 
-        @fechar="fecharForm" 
-        @salvar="salvarItem" 
-      />
+  <div class="container">
+    <h1>Gerenciar "Quem Somos"</h1>
+    <div class="add-voltar">
+      <button class="btn-add" @click="openCreateModal()">Adicionar</button>
+      <button class="btn-back" @click="voltar()">Voltar Para a Administração</button>
     </div>
-  </template>
-  
-  <script lang="ts">
-  import { defineComponent, ref } from 'vue';
-  import QuemSomosForm from './QuemSomosForm.vue';
-import router from '../../../../router';
-  
-  export default defineComponent({
-    components: { QuemSomosForm },
-    setup() {
-      const quemSomos = ref([
-        { id: 1, texto: 'Texto inicial', img: 'img1.jpg' },
-      ]);
-      const exibirForm = ref(false);
-      const itemEditar = ref(null);
-  
-      const abrirForm = () => {
-        itemEditar.value = null;
-        exibirForm.value = true;
-      };
-  
-      const editarItem = (item: any) => {
-        itemEditar.value = { ...item };
-        exibirForm.value = true;
-      };
-  
-      const excluirItem = (id: number) => {
-        quemSomos.value = quemSomos.value.filter(item => item.id !== id);
-      };
-  
-      const salvarItem = (item: any) => {
-        if (item.id) {
-          const index = quemSomos.value.findIndex(i => i.id === item.id);
-          if (index !== -1) quemSomos.value[index] = item;
-        } else {
-          item.id = Date.now();
-          quemSomos.value.push(item);
-        }
-      };
-  
-      const fecharForm = () => {
-        exibirForm.value = false;
-      };
-      
-      const backAdmin = () =>{
-        router.push('/admin');
-      }
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Texto</th>
+          <th>Imagem</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="entry in entries" :key="entry.id">
+          <td>{{ entry.text }}</td>
+          <td><img :src="entry.image" alt="Imagem" width="150" /></td>
+          <td class="acoes">
+            <button class="btn-editar" @click="openEditModal(entry)">Editar</button>
+            <button class="btn-excluir" @click="deleteEntry(entry.id)">Excluir</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
-      return {
-        quemSomos,
-        exibirForm,
-        itemEditar,
-        abrirForm,
-        backAdmin,
-        editarItem,
-        excluirItem,
-        salvarItem,
-        fecharForm,
-      };
-    },
-  });
-  </script>
-  
-  <style scoped>
+    <!-- Modal para criação/edição -->
+    <div v-if="showModal" class="modal">
+      <div class="modal-content">
+        <h2>{{ isEditing ? 'Editar' : 'Adicionar' }} Entrada</h2>
+        <form @submit.prevent="handleSubmit">
+          <div>
+            <label for="text">Texto:</label>
+            <input
+              v-model="formData.text"
+              type="text"
+              id="text"
+              placeholder="Texto para quem somos"
+              required
+            />
+          </div>
+          <div>
+            <label for="image">Imagem:</label>
+            <input
+              type="file"
+              id="image"
+              accept="image/*"
+              @change="handleFileUpload"
+            />
+          </div>
+          <div class="modal-buttons">
+            <button type="submit">{{ isEditing ? 'Salvar' : 'Criar' }}</button>
+            <button type="button" @click="closeModal">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent, ref, reactive, onMounted } from 'vue';
+import axios from 'axios';
+import env from '../../../../../env'; // Certifique-se de configurar corretamente o ambiente
+import { useRouter } from 'vue-router';
+interface AboutUsEntry {
+  id: string;
+  text: string;
+  image: string;
+}
+
+export default defineComponent({
+  setup() {
+    const entries = ref<AboutUsEntry[]>([]);
+    const showModal = ref(false);
+    const isEditing = ref(false);
+    const formData = reactive({
+      id: '',
+      text: '',
+      image: null as File | null,
+    });
+    const router = useRouter();
+    // Carregar entradas da API
+    const loadEntries = async () => {
+      try {
+        const response = await axios.get(`${env.url.local}/about`, {
+          headers: { "ngrok-skip-browser-warning": "true" },
+        });
+        entries.value = response.data.data.map((entry: any) => ({
+          id: entry.id,
+          text: entry.text,
+          image: entry.image,
+        }));
+      } catch (error) {
+        console.error('Erro ao carregar entradas:', error);
+      }
+    };
+
+    // Manipular upload de imagem
+    const handleFileUpload = (event: Event) => {
+      const target = event.target as HTMLInputElement;
+      if (target.files && target.files[0]) {
+        formData.image = target.files[0];
+      }
+    };
+
+    // Abrir modal para adicionar
+    const openCreateModal = () => {
+      isEditing.value = false;
+      formData.id = '';
+      formData.text = '';
+      formData.image = null;
+      showModal.value = true;
+    };
+
+    // Abrir modal para editar
+    const openEditModal = (entry: AboutUsEntry) => {
+      isEditing.value = true;
+      formData.id = entry.id;
+      formData.text = entry.text;
+      formData.image = null;  // Caso queira permitir que a imagem seja reeditada, remova esta linha.
+      showModal.value = true;
+    };
+
+    // Enviar formulário (criar ou editar)
+    const handleSubmit = async () => {
+      try {
+        const data = new FormData();
+        data.append('text', formData.text);
+        if (formData.image) {
+          data.append('image', formData.image);
+        }
+
+        if (isEditing.value) {
+          // Atualizar (editar)
+          await axios.put(`${env.url.local}/about/${formData.id}`, data, {
+            headers: { "ngrok-skip-browser-warning": "true" },
+          });
+        } else {
+          // Criar nova entrada
+          await axios.post(`${env.url.local}/about`, data, {
+            headers: { "ngrok-skip-browser-warning": "true" },
+          });
+        }
+
+        closeModal();
+        loadEntries();
+      } catch (error) {
+        console.error('Erro ao salvar entrada:', error);
+      }
+    };
+
+    // Excluir entrada
+    const deleteEntry = async (id: string) => {
+      if (!confirm('Tem certeza que deseja excluir esta entrada?')) return;
+      try {
+        await axios.delete(`${env.url.local}/about/${id}`, {
+          headers: { "ngrok-skip-browser-warning": "true" },
+        });
+        loadEntries();
+      } catch (error) {
+        console.error('Erro ao excluir entrada:', error);
+      }
+    };
+
+    const voltar = () => {
+      router.push('/admin')
+    }
+
+    // Fechar modal
+    const closeModal = () => {
+      showModal.value = false;
+    };
+
+    // Carregar entradas ao montar o componente
+    onMounted(() => {
+      loadEntries();
+    });
+
+    return {
+      entries,
+      showModal,
+      isEditing,
+      formData,
+      voltar,
+      openCreateModal,
+      openEditModal,
+      handleFileUpload,
+      handleSubmit,
+      deleteEntry,
+      closeModal,
+    };
+  },
+});
+</script>
+<style scoped>
 /* Importando fonte */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap');
 
@@ -149,7 +248,9 @@ h1 {
 .btn-add {
   background-color: #28a745;
 }
-
+img{
+  width: 100px;
+}
 .btn-add:hover {
   background-color: #218838;
 }
@@ -180,7 +281,9 @@ h1 {
   color: #fff;
   font-weight: bold;
 }
-
+.table td{
+  height: 10.5dvh;
+}
 .table tr:nth-child(even) {
   background-color: #f2f2f2;
 }
@@ -288,5 +391,3 @@ form button:hover {
   background-color: #3b7ac8;
 }
 </style>
-
-  

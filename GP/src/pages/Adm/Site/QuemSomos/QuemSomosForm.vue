@@ -1,60 +1,84 @@
 <template>
-    <div>
-      <h2>{{ itemEditar ? "Editar" : "Adicionar" }} Quem Somos</h2>
-      <form @submit.prevent="salvar">
-        <textarea v-model="form.texto" placeholder="Texto"></textarea>
-        <input type="text" v-model="form.img" placeholder="URL da Imagem" />
-        <button type="submit">Salvar</button>
-        <button type="button" @click="$emit('fechar')">Cancelar</button>
-      </form>
-    </div>
-  </template>
-  
-  <script lang="ts">
-  import { defineComponent, ref, watch } from 'vue';
-  
-  export default defineComponent({
-    props: ['itemEditar'],
-    emits: ['salvar', 'fechar'],
-    setup(props, { emit }) {
-      const form = ref({ id: null, texto: '', img: '' });
-  
-      watch(
-        () => props.itemEditar,
-        (novoItem) => {
-          form.value = novoItem ? { ...novoItem } : { id: null, texto: '', img: '' };
-        },
-        { immediate: true }
-      );
-  
-      const salvar = () => {
-        emit('salvar', { ...form.value });
-      };
-  
-      return { form, salvar };
-    },
-  });
-  </script>
-  
-  <style scoped>
-/* Importando fonte */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap');
+  <div class="form-container">
+    <h2>{{ itemEditar ? 'Editar' : 'Adicionar' }} Entrada</h2>
+    <form @submit.prevent="salvarItem">
+      <div>
+        <label for="texto">Texto:</label>
+        <textarea v-model="item.texto" id="texto" required></textarea>
+      </div>
+      <div>
+        <label for="imagem">Imagem:</label>
+        <input type="file" @change="handleFileUpload" id="imagem" />
+        <div v-if="item.img">
+          <img :src="item.img" alt="Imagem" width="150" />
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="submit">{{ itemEditar ? 'Salvar Alterações' : 'Adicionar Entrada' }}</button>
+        <button type="button" @click="fecharForm">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</template>
 
-/* Tipografia geral */
-a,
-h1,
-p,
-h2,
-h3,
-label,
-span,
-td, th {
-  font-family: "Poppins", serif;
-}
+<script lang="ts">
+import { defineComponent, ref, watch, toRef } from 'vue';
 
-/* Estilo do contêiner principal */
-.container {
-  max-width: 80%;
+export default defineComponent({
+  props: {
+    itemEditar: Object,
+  },
+  setup(props, { emit }) {
+    const item = ref({
+      id: '',
+      texto: '',
+      img: null as string | null,
+    });
+
+    watch(
+      () => props.itemEditar,
+      (newItem) => {
+        if (newItem) {
+          item.value = { ...newItem };
+        }
+      },
+      { immediate: true }
+    );
+
+    const handleFileUpload = (event: Event) => {
+      const target = event.target as HTMLInputElement;
+      if (target.files && target.files[0]) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          item.value.img = reader.result as string;
+        };
+        reader.readAsDataURL(target.files[0]);
+      }
+    };
+
+    const salvarItem = () => {
+      emit('salvar', item.value);
+      fecharForm();
+    };
+
+    const fecharForm = () => {
+      emit('fechar');
+    };
+
+    return {
+      item,
+      handleFileUpload,
+      salvarItem,
+      fecharForm,
+    };
+  },
+});
+</script>
+
+<style scoped>
+/* Estilos do formulário */
+.form-container {
+  max-width: 500px;
   margin: 20px auto;
   padding: 20px;
   background-color: #fff;
@@ -62,140 +86,10 @@ td, th {
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-h1 {
-  font-size: 24px;
-  color: #4a90e2;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-/* Botões "Adicionar" e "Voltar" */
-.add-voltar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.add-voltar button {
-  padding: 8px 16px;
-  font-size: 14px;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  margin-bottom: 15px;
-}
-
-.btn-add {
-  background-color: #28a745;
-}
-
-.btn-add:hover {
-  background-color: #218838;
-}
-
-.btn-back {
-  background-color: #0396f8;
-}
-
-.btn-back:hover {
-  background-color: #0095c2;
-}
-
-/* Estilo da tabela */
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-}
-
-.table th, .table td {
-  padding: 12px;
-  text-align: left;
-  border: 1px solid #ddd;
-}
-
-.table th {
-  background-color: #4a90e2;
-  color: #fff;
-  font-weight: bold;
-}
-
-.table tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
-
-.table tr:hover {
-  background-color: #e9e9e9;
-}
-
-/* Seção de ações */
-.acoes {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-}
-
-/* Botões de ação */
-button {
-  padding: 6px 12px;
-  font-size: 14px;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  margin: 0 3px;
-}
-
-.btn-detalhes {
-  background-color: #007bff;
-}
-
-.btn-detalhes:hover {
-  background-color: #0056b3;
-}
-
-.btn-editar {
-  background-color: #ff7300;
-}
-
-.btn-editar:hover {
-  background-color: #ff6600;
-}
-
-.btn-excluir {
-  background-color: #dc3545;
-}
-
-.btn-excluir:hover {
-  background-color: #c82333;
-}
-
-/* Barra de pesquisa */
-.search-bar {
-  width: 97.5%;
-  padding: 8px 12px;
-  margin: 15px 0;
-  font-size: 14px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  outline: none;
-  transition: border-color 0.3s;
-}
-
-.search-bar:focus {
-  border-color: #4a90e2;
-}
-
-/* Estilo adicional para formulários */
 form {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: 20px;
+  gap: 15px;
 }
 
 form textarea,
@@ -213,20 +107,27 @@ form input:focus {
   border-color: #4a90e2;
 }
 
-form button {
-  width: fit-content;
+button {
   padding: 10px 20px;
-  font-size: 16px;
   background-color: #4a90e2;
-  color: #fff;
+  color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s;
 }
 
-form button:hover {
+button:hover {
   background-color: #3b7ac8;
 }
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+img {
+  margin-top: 10px;
+  max-width: 150px;
+}
 </style>
-  

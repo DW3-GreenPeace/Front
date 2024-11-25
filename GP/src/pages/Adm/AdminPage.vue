@@ -2,6 +2,14 @@
     <div class="container">
       <header>
         <h1>Bem-vindo à Área de Administração</h1>
+        <ul>
+          <li>
+            <router-link to="/quem-somos">Quem somos</router-link>
+          </li>
+          <li>
+            <router-link to="/temas">Temas</router-link>
+          </li>
+        </ul>
         <button @click="handleLogout">Sair</button>
       </header>
       <AdminDashboard />
@@ -52,6 +60,21 @@ label {
   border-radius: 8px;
   /* box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); */
   text-align: center;
+}
+
+li,
+a {
+  text-decoration: none;
+  list-style: none;
+  color: rgb(53, 53, 53);
+  text-decoration: underline;
+}
+
+ul {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 30%;
 }
 
 /* Título */

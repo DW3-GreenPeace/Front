@@ -7,21 +7,21 @@
         <div class="card">
           <h1>Campanhas</h1>
           <div class="info">
-            <p>Aqui a adiminstração podera ver, criar, editar e expluir uma campanha</p>
+            <p>Aqui a adiminstração poderá ver, criar, editar e expluir uma campanha</p>
           </div>
           <button>
-            <router-link to="/admin/campanha/list" class="link">Gerenciar Campanhas</router-link>
+            <router-link to="/campaigns/list" class="link">Gerenciar Campanhas</router-link>
           </button>
         </div>
       </li>
       <li>
         <div class="card">
-          <h1>Voluntarios</h1>
+          <h1>Voluntários</h1>
           <div class="info">
-            <p>Aqui a adiminstração podera ver, criar, editar e expluir uma campanha</p>
+            <p>Aqui a adiminstração poderá ver, criar, editar e expluir uma campanha</p>
           </div>
           <button>
-            <router-link to="/admin/voluntario/list">Gerenciar Voluntários</router-link>
+            <router-link to="/volunteers">Gerenciar Voluntários</router-link>
           </button>
         </div>
       </li>
@@ -32,7 +32,7 @@
             <p>Acompanhar os pagamentos das doações</p>
           </div>
           <button>
-            <router-link to="/admin/relatorio">Ver Relatório</router-link>
+            <router-link to="/donations">Ver Relatório</router-link>
           </button>
         </div>
       </li>

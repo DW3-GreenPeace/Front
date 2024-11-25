@@ -1,15 +1,18 @@
 <template>
-  <header v-if="which === 'usuario'">
-    <div class="logo">
-      <h1>GreenPeace</h1>
-    </div>
-    <ul>
-      <li><router-link to="/">Inicio</router-link></li>
-      <li><router-link to="/campaigns">Campanhas</router-link></li>
-      <li><router-link to="/doacoes">Doar</router-link></li>
-    </ul>
-    <button @click="perfil">Perfil</button>
-  </header>
+  <div v-if="which === 'usuario'">
+    <header>
+      <div class="logo">
+        <h1>GreenPeace</h1>
+      </div>
+      <ul>
+        <li><router-link to="/">Inicio</router-link></li>
+        <li><router-link to="/campaigns">Campanhas</router-link></li>
+        <li><router-link to="/doacoes">Doar</router-link></li>
+      </ul>
+      <button @click="perfil">Perfil</button>
+    </header>
+  </div>
+
 
   <header v-else-if="which === 'adm'">
     <div class="logo">

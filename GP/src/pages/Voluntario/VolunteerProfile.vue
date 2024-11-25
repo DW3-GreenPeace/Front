@@ -3,31 +3,32 @@
     <div class="profile">
       <div class="user">
         <div class="foto"></div>
-        <h1>Bem-vindo, {{ usuario?.name }}</h1>
-        <p> {{ usuario?.email }}</p>
+        <h1> {{ usuario.name }}</h1>
+        <p> {{ usuario.email }}</p>
       </div>
       <div class="buttons">
-        <button @click="createCampaign">Criar Campanha</button>
+        <!-- <button @click="createCampaign">Criar Campanha</button> -->
         <button @click="toggleEdit">Editar Perfil</button>
-      <button @click="logout">Sair</button>
+        <button @click="logout">Sair</button>
       </div>
     </div>
-      <div class="campaigns">
-        <h2>Suas Campanhas</h2>
-        <ul v-if="campaigns.length > 0">
-          <li v-for="(campaign, index) in campaigns" :key="index">
-            {{ campaign.name }} - {{ campaign.description }}
-          </li>
-        </ul>
-        <p v-else>Você ainda não está inscrito em nenhuma campanha.</p>
-      </div>
-    
+    <div class="campaigns">
+      <h2>Suas Campanhas</h2>
+      <ul v-if="campaigns.length > 0">
+        <li v-for="(campaign, index) in campaigns" :key="index">
+          {{ campaign.name }} - {{ campaign.description }}
+        </li>
+      </ul>
+      <p v-else>Você ainda não está inscrito em nenhuma campanha.</p>
+    </div>
+
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import { useAuth } from "../../services/authService";
 
 export default defineComponent({
   name: "Profile",
@@ -35,21 +36,35 @@ export default defineComponent({
     const router = useRouter();
     const usuario = ref({
       name: "",
+      cpf: "",
+      rg: "",
+      endereco: "",
+      birth: "",
       email: "",
+      phone: "",
+      skills: [] as string[], // Array de strings para as habilidades
       secretaria: false,
     });
-    const editing = ref(false);
     const campaigns = ref([]); // Lista de campanhas do usuário
-    const editData = ref({ name: "", email: "" });
-
-    // Carrega os dados do usuário ao montar o componente
-    onMounted(() => {
-      const userData = localStorage.getItem("usuario");
+    const usuarioLogado = useAuth();
+    const userId = localStorage.getItem('volunteerId') || usuarioLogado?.id;
+    // Carrega os dados do usuário
+    const carregarUsuario = () => {
+      const userData = localStorage.getItem("usuario"); 
       if (userData) {
         try {
-          usuario.value = JSON.parse(userData);
-          editData.value = { ...usuario.value }; // Preenche os dados de edição
-          loadCampaigns(); // Carrega as campanhas do usuário
+          const parsedData = JSON.parse(userData);
+          usuario.value = {
+            name: parsedData.name || "",
+            cpf: parsedData.cpf || "",
+            rg: parsedData.rg || "",
+            endereco: parsedData.endereco || "",
+            birth: parsedData.birth || "",
+            email: parsedData.email || "",
+            phone: parsedData.phone || "",
+            skills: parsedData.skills || [],
+            secretaria: parsedData.secretaria || false,
+          };
         } catch (error) {
           console.error("Erro ao analisar os dados do usuário:", error);
           localStorage.removeItem("usuario");
@@ -60,38 +75,17 @@ export default defineComponent({
         alert("Usuário não autenticado. Redirecionando para o login.");
         router.push("/");
       }
+    };
+
+
+    onMounted(() => {
+      carregarUsuario();
     });
 
-    // Função para alternar modo de edição
     const toggleEdit = () => {
-      router.push('/volunteers/form')
+      router.push(`/volunteers/form/${userId}`); // Redireciona para o formulário de edição
     };
 
-    // Função para salvar alterações do perfil
-    const saveEdit = () => {
-      usuario.value = { ...editData.value };
-      localStorage.setItem("usuario", JSON.stringify(usuario.value));
-      alert("Perfil atualizado com sucesso!");
-      toggleEdit();
-    };
-
-    // Função para criar uma nova campanha
-    const createCampaign = () => {
-      const newCampaign = {
-        name: "Nova Campanha",
-        description: "Descrição da campanha",
-      };
-      campaigns.value.push(newCampaign);
-      alert("Campanha criada com sucesso!");
-    };
-
-    // Função para carregar campanhas do usuário
-    const loadCampaigns = () => {
-      // Simulando campanhas do usuário
-     
-    };
-
-    // Função de logout
     const logout = () => {
       localStorage.removeItem("usuario");
       alert("Você foi desconectado.");
@@ -101,12 +95,9 @@ export default defineComponent({
     return {
       usuario,
       campaigns,
-      editing,
-      editData,
       toggleEdit,
-      saveEdit,
-      createCampaign,
       logout,
+      carregarUsuario,
     };
   },
 });
@@ -139,7 +130,7 @@ body {
   width: 100%;
 }
 
-.buttons{
+.buttons {
   width: 40%;
   display: flex;
   align-items: center;

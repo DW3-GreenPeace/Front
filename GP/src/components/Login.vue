@@ -98,8 +98,6 @@ export default defineComponent({
               adm: true
             })
           );
-
-         
           return;
         }
 
@@ -109,6 +107,8 @@ export default defineComponent({
           return;
         }
         localStorage.setItem("usuario", JSON.stringify(response.data));
+        localStorage.setItem('volunteerId', response.data.id);
+
         router.push("/inicio/volunteer");
       } catch (error) {
         console.error("Erro:", error);

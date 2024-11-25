@@ -1,122 +1,175 @@
 <template>
   <div class="container">
-    <h1>Detalhes do Voluntário</h1>
-    <div class="add-voltar">
-      <router-link to="/admin">
-        <button class="btn-back">Voltar Para a Admistração</button>
-          </router-link>
+    <h1>Detalhes da Campanha: {{ campaign.title }}</h1>
+    <button @click="backToCampaigns" class="btn-back">Voltar Para a Lista de Campanhas</button>
+
+    <div class="campaign-info">
+      <p><strong>Descrição:</strong> {{ campaign.description }}</p>
+      <p><strong>Endereço:</strong> {{ campaign.address }}</p>
+      <p><strong>Data de Início:</strong> {{ formatDate(campaign.startDate) }}</p>
+      <p><strong>Data de Término:</strong> {{ formatDate(campaign.endDate) }}</p>
     </div>
-    <div v-if="volunteer" class="voluntario">
-      <p><strong>Nome:</strong> {{ volunteer.name }}</p>
-      <p><strong>Email:</strong> {{ volunteer.email }}</p>
-      <p><strong>Idade:</strong> {{ volunteer.age }}</p>
-      <p><strong>Habilidades:</strong> {{ volunteer.skills.join(', ') }}</p>
-      <p><strong>Disponibilidade:</strong> {{ volunteer.availability }}</p>
-    </div>
+
+    <h2>Voluntários Associados</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Email</th>
+          <th>Data de Cadastro</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Se não houver voluntários, a tabela não será exibida -->
+        <tr v-if="volunteers.length === 0">
+          <td colspan="3">Nenhum voluntário associado a esta campanha.</td>
+        </tr>
+        <tr v-for="volunteer in volunteers" :key="volunteer.id">
+          <td>{{ volunteer.name }}</td>
+          <td>{{ volunteer.email }}</td>
+          <td>{{ formatDate(volunteer.registrationDate) }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
-  </template>
-  
-  <script lang="ts">
-  import { defineComponent, ref, onMounted } from 'vue';
-  import { Volunteer } from '../../types/volunteer';
-  import { getVolunteerById } from '../../services/volunteerService';
-  import { useRoute } from 'vue-router';
-  
-  export default defineComponent({
-    setup() {
-      const volunteer = ref<Volunteer | null>(null);
-      const router = useRoute();
-      const id = Number(router.params.id);
-  
-      onMounted(async () => {
-        volunteer.value = await getVolunteerById(id) || null;
-      });
-      return { volunteer };
-    }
-  });
-  </script>
-  <style scoped>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+</template>
 
-a,
-h1,
-p,
-h2,
-h3,
-label,
-span,
-td, th {
-  font-family: "Poppins", serif;
-}
-  /* Container geral */
-  .container{
-    height: 80dvh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-  }
+<script lang="ts">
+import { defineComponent, ref, onMounted } from 'vue';
+import axios from 'axios';
+import { useRoute, useRouter } from 'vue-router';
+import env from '../../../env';
 
-  .voluntario {
-    padding: 20px;
-    width: 80%;
-    margin: auto;
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  }
-  .add-voltar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+interface Campaign {
+  id: string;
+  title: string;
+  description: string;
+  address: string;
+  startDate: string;
+  endDate: string;
+  volunteers: Volunteer[];
 }
 
-.add-voltar button {
+interface Volunteer {
+  id: string;
+  name: string;
+  email: string;
+  registrationDate: string;
+}
+
+export default defineComponent({
+  setup() {
+    const campaign = ref<Campaign>({} as Campaign);
+    const volunteers = ref<Volunteer[]>([]);
+    const route = useRoute();
+    const router = useRouter();
+
+    // Função para carregar os detalhes da campanha e os voluntários
+    const loadCampaignDetails = async () => {
+      const campaignId = route.params.id as string;
+      try {
+        // Exemplo de dados simulados com base na sua estrutura
+        const response = {
+          data: {
+            title: "aaaaaaaaaaaaaaaaaaaaaa",
+            description: "aaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            address: "aaaaaaaaaaaaaaaaaaaaaaa",
+            startDate: "2024-11-26",
+            endDate: "2024-11-30",
+            volunteers: [] // Nenhum voluntário neste caso
+          }
+        };
+
+        // Atribuindo os dados simulados à variável campaign
+        campaign.value = response.data;
+
+        // Caso queira obter voluntários da API, descomente a linha abaixo:
+        // const volunteersResponse = await axios.get(`${env.url.local}/campaigns/${campaignId}/volunteers`);
+        // volunteers.value = volunteersResponse.data.data;
+
+      } catch (error) {
+        console.error('Erro ao buscar detalhes da campanha:', error);
+      }
+    };
+
+    // Função para formatar as datas
+    const formatDate = (dateString: string): string => {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    };
+
+    // Função para voltar para a lista de campanhas
+    const backToCampaigns = () => {
+      router.push('/campaigns');
+    };
+
+    onMounted(() => {
+      loadCampaignDetails();
+    });
+
+    return {
+      campaign,
+      volunteers,
+      formatDate,
+      backToCampaigns,
+    };
+  },
+});
+</script>
+
+<style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+.container {
+  max-width: 80%;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+}
+
+h1, h2 {
+  color: #4a90e2;
+}
+
+button {
   padding: 8px 16px;
-  font-size: 14px;
-  color: #fff;
+  background-color: #0396f8;
+  color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s;
-  margin-bottom: 15px;
 }
 
-.btn-back {
-  background-color: #0396f8;
+button:hover {
+  background-color: #007bb5;
 }
 
-.btn-back:hover {
-  background-color: #0095c2;
+.campaign-info {
+  margin-bottom: 20px;
 }
-  /* Cabeçalho */
-  h2 {
-    color: #333;
-    font-size: 24px;
-    margin-bottom: 15px;
-    text-align: center;
-    border-bottom: 2px solid #4a90e2;
-    padding-bottom: 5px;
-  }
-  
-  /* Estilos do parágrafo */
-  p {
-    font-size: 16px;
-    color: #555;
-    line-height: 1.6;
-    margin: 10px 0;
-  }
-  
-  /* Destacar rótulos */
-  strong {
-    font-weight: bold;
-    color: #333;
-  }
-  
-  /* Adicionar espaçamento entre as linhas de informação */
-  p:not(:last-child) {
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 8px;
-  }
-  </style>
-  
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th, .table td {
+  padding: 10px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+.table th {
+  background-color: #4a90e2;
+  color: white;
+}
+
+.table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.table tr:hover {
+  background-color: #f1f1f1;
+}
+</style>

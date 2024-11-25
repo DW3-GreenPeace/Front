@@ -1,35 +1,31 @@
 <template>
   <div class="container">
     <h1>Lista de Voluntários</h1>
-    <div class="add-voltar">
-      <!-- <button @click="addVolunteer" class="btn-add">Adicionar Voluntario</button> -->
-      <button @click="backAdmin" class="btn-back">Voltar Para a Admistração</button>
-    </div>
-    <input 
-      type="text" 
-      v-model="searchQuery" 
-      placeholder="Pesquisar Voluntários..." 
-      class="search-bar"
-    />
-    
+    <button @click="backAdmin" class="btn-back">Voltar Para a Administração</button>
     <table class="table">
       <thead>
         <tr>
           <th>Nome</th>
           <th>Email</th>
           <th>CPF</th>
+          <th>Habilidades</th>
           <th>Ações</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="volunteer in filteredVolunteers" :key="volunteer.id">
+        <tr v-for="volunteer in volunteers" :key="volunteer.id">
           <td>{{ volunteer.name }}</td>
           <td>{{ volunteer.email }}</td>
           <td>{{ volunteer.cpf }}</td>
+          <td>
+            <ul>
+              <li v-for="skill in volunteer.skills" :key="skill">{{ skill }}</li>
+            </ul>
+          </td>
           <td class="acoes">
-            <!-- <button @click="editVolunteer(volunteer.id)" class="btn-editar">Editar</button> -->
-            <button @click="viewDetails(volunteer.id)" class="btn-detalhes">Ver Detalhes</button>
-            <button @click="deleteVolunteer(volunteer.id)" class="btn-excluir">Excluir</button>
+            <button class="btn-detalhes" @click="viewDetails(volunteer.id)">Ver Detalhes</button>
+            <button class="btn-editar" @click="editVolunteer(volunteer.id)">Editar</button>
+            <button class="btn-excluir" @click="deleteVolunteer(volunteer.id)">Excluir</button>
           </td>
         </tr>
       </tbody>
@@ -37,47 +33,89 @@
   </div>
 </template>
 
-  
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted } from 'vue';
-import { Volunteer } from '../../types/volunteer';
-import { getVolunteers, deleteVolunteer } from '../../services/volunteerService';
+import { defineComponent, ref, onMounted } from 'vue';
+import axios from 'axios';
+import env from '../../../env'; // Certifique-se de configurar corretamente seu ambiente
 import { useRouter } from 'vue-router';
+
+interface Volunteer {
+  id: string;
+  name: string;
+  email: string;
+  cpf: string;
+  rg: string;
+  endereco: string;
+  birth: number; // Data em timestamp
+  phone: string;
+  skills: string[];
+}
 
 export default defineComponent({
   setup() {
     const volunteers = ref<Volunteer[]>([]);
-    const searchQuery = ref("");
     const router = useRouter();
 
     const loadVolunteers = async () => {
-      volunteers.value = await getVolunteers();
+      try {
+        const response = await axios.get(`${env.url.local}/volunteers`, {
+          headers: { "ngrok-skip-browser-warning": "true" },
+          mode: "cors",
+        });
+        volunteers.value = response.data.data; // Ajuste conforme a estrutura do seu JSON
+      } catch (error) {
+        console.error('Erro ao buscar voluntários:', error);
+      }
     };
 
-    const filteredVolunteers = computed(() => {
-      return volunteers.value.filter(volunteer =>
-        volunteer.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-        volunteer.email.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-        volunteer.cpf.toLowerCase().includes(searchQuery.value.toLowerCase())
-      );
+    const formatDate = (timestamp: number): string => {
+      const date = new Date(timestamp);
+      return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    };
+    const viewDetails = (id: string) => {
+      router.push(`/volunteers/${id}`);
+    };
+
+    const editVolunteer = (id: string) => {
+      router.push(`/volunteers/form/${id}`);
+    };
+
+    const deleteVolunteer = async (id: string) => {
+      const confirmDelete = confirm('Tem certeza que deseja excluir este voluntário?');
+      if (confirmDelete) {
+        try {
+          await axios.delete(`${env.url.local}/volunteers/${id}`, {
+            headers: { "ngrok-skip-browser-warning": "true" },
+          });
+          // Remove o voluntário da lista local sem recarregar a página
+          volunteers.value = volunteers.value.filter(volunteer => volunteer.id !== id);
+          alert('Voluntário excluído com sucesso!');
+        } catch (error) {
+          console.error('Erro ao excluir voluntário:', error);
+          alert('Erro ao excluir voluntário.');
+        }
+      }
+    };
+
+    const backAdmin = () => router.push('/admin');
+
+    onMounted(() => {
+      loadVolunteers();
     });
 
-    const viewDetails = (id: number) => router.push(`/admin/volunteer/${id}`);
-    const addVolunteer = () => router.push(`/admin/volunteer/new`);
-    const backAdmin = () => router.push(`/admin`);
-    const editVolunteer = (id: number) => router.push(`/admin/volunteer/edit/${id}`);
-
-    const deleteVolunteerById = async (id: number) => {
-      await deleteVolunteer(id);
-      loadVolunteers();
+    return {
+      volunteers,
+      editVolunteer, 
+      viewDetails,
+      deleteVolunteer,
+      formatDate,
+      backAdmin,
     };
-
-    onMounted(loadVolunteers);
-
-    return { volunteers, searchQuery, filteredVolunteers, viewDetails, addVolunteer, backAdmin, editVolunteer, deleteVolunteer: deleteVolunteerById };
-  }
+  },
 });
 </script>
+
+
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
@@ -100,7 +138,11 @@ td, th {
   border-radius: 8px;
   /* box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); */
 }
-
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
 h1 {
   font-size: 24px;
   color: #4a90e2;
@@ -152,6 +194,9 @@ h1 {
   padding: 12px;
   text-align: left;
   border: 1px solid #ddd;
+}
+.table td{
+  height: 7dvh;
 }
 
 .table th {

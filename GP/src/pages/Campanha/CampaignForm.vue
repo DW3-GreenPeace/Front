@@ -46,7 +46,7 @@ export default defineComponent({
       address: "",
       startDate: "",
       endDate: "",
-      volunteers: []
+      volunteers: [],
     });
 
     // Carregar dados da campanha caso seja edição

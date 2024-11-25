@@ -6,6 +6,7 @@ import DonationReport from '../pages/Adm/DonationReport.vue';
 import CampaignDetails from '../pages/Campanha/CampaignDetails.vue';
 import CampaignForm from '../pages/Campanha/CampaignForm.vue';
 import CampaignList from '../pages/Campanha/CampaignList.vue';
+import CampaignAll from '../pages/Campanha/CampaingAll.vue';
 import Inicio from '../pages/inicio/Inicio.vue';
 import Register from '../components/Register.vue';
 import VolunteerDetails from '../pages/Voluntario/VolunteerDetails.vue';
@@ -33,9 +34,7 @@ const routes = [
   { path: '/login', name: 'Login', component: Login },
   { path: '/register', name: 'Register', component: Register },
 
-  { path: '/donationslist', name: 'DonationReport', component: DonationReport },
-
-  { path: '/campaigns', name: 'CampaignList', component: CampaignList },
+  { path: '/campaigns', name: 'CampaignAll', component: CampaignAll },
   // Rotas de perfil do voluntário
   {
     path: '/volunteer/profile',
@@ -56,27 +55,30 @@ const routes = [
     name: 'AdminPage',
     component: AdminPage,
     // meta: { requiresAuth: true, requiresAdmin: true },
-    children: [
-      { path: 'dashboard', name: 'AdminDashboard', component: AdminDashboard },
-      // { path: 'donations', name: 'DonationReport', component: DonationReport },
-      { path: 'quem-somos', name: 'QuemSomosList', component: QuemSomosList },
-      { path: 'temas', name: 'TemasList', component: TemasList },
-    ],
   },
+
+  { path: '/donations', name: 'DonationReport', component: DonationReport },
+
+  { path: '/dashboard', name: 'AdminDashboard', component: AdminDashboard },
+
+  { path: '/quem-somos', name: 'QuemSomosList', component: QuemSomosList },
+
+  { path: '/temas', name: 'TemasList', component: TemasList },
+
 
   // Rotas de campanhas
   // { path: '/campaigns', name: 'CampaignList', component: CampaignList, meta: { requiresAuth: true } },
-  { path: '/campaigns/:id', name: 'CampaignDetails', component: CampaignDetails, meta: { requiresAuth: true } },
-  { path: '/campaigns/form', name: 'CampaignForm', component: CampaignForm, meta: { requiresAuth: true, requiresAdmin: true } },
-  { path: '/campaigns/create', name: 'CampaignCreate', component: CampaignCreate, meta: { requiresAuth: true, requiresAdmin: true } },
+  { path: '/campaigns/:id', name: 'CampaignDetails', component: CampaignDetails },
+  { path: '/campaigns/list', name: 'CampaignList', component: CampaignList},
+  { path: '/campaigns/create', name: 'CampaignCreate', component: CampaignCreate },
 
   // Rotas de voluntários
-  { path: '/volunteers', name: 'VolunteerList', component: VolunteerList, meta: { requiresAuth: true, requiresAdmin: true } },
-  { path: '/volunteers/:id', name: 'VolunteerDetails', component: VolunteerDetails, meta: { requiresAuth: true, requiresAdmin: true } },
-  { path: '/volunteers/form', name: 'VolunteerForm', component: VolunteerForm, meta: { requiresAuth: true, requiresAdmin: true } },
+  { path: '/volunteers', name: 'VolunteerList', component: VolunteerList },
+  { path: '/volunteers/:id', name: 'VolunteerDetails', component: VolunteerDetails },
+  { path: '/volunteers/form/:id', name: 'VolunteerForm', component: VolunteerForm },
 
   // Rotas de doações
-  { path: '/donations/create', name: 'CreateDonations', component: CreateDonations, meta: { requiresAuth: true } },
+  { path: '/donations/create', name: 'CreateDonations', component: CreateDonations },
 
   // Página 404 para rotas não encontradas
   // { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('../pages/NotFound.vue') },

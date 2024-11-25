@@ -23,6 +23,7 @@
                 {{ carregando ? "Criando..." : "Criar Campanha" }}
             </button>
         </form>
+        <button class="btn-voltar" @click="voltar">Voltar</button>
     </div>
 </template>
 
@@ -45,6 +46,9 @@ export default defineComponent({
 
         const router = useRouter();
 
+        const voltar = () => {
+            router.back(); // Retorna à página anterior
+        };
         const handleSubmit = async () => {
             if (!title.value || !description.value || !address.value || !startDate.value || !endDate.value) {
                 mensagem.value = "Por favor, preencha todos os campos.";
@@ -57,7 +61,7 @@ export default defineComponent({
                 address: address.value,
                 startDate: startDate.value,
                 endDate: endDate.value,
-                volunteers: [0],
+                volunteers: []
             };
 
             carregando.value = true;
@@ -72,14 +76,14 @@ export default defineComponent({
                     mode: "cors",
                 });
 
-                if (response.status === 201) {
+                if (response.status === 200) {
                     Swal.fire({
                         title: "Sucesso!",
                         text: "Campanha criada com sucesso!",
                         icon: "success",
                         confirmButtonText: "Ok",
                     }).then(() => {
-                        router.push("/admin/campanha/list");
+                        router.push("/campaigns/list");
                     });
                 } else {
                     mensagem.value = "Erro ao criar a campanha.";
@@ -99,6 +103,7 @@ export default defineComponent({
             startDate,
             endDate,
             mensagem,
+            voltar,
             carregando,
             handleSubmit,
         };
@@ -168,5 +173,22 @@ button:disabled {
     color: red;
     font-size: 12px;
     margin-top: 10px;
+}
+
+.btn-voltar {
+    background-color: #6c757d;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+    text-align: center;
+}
+
+.btn-voltar:hover {
+    background-color: #5a6268;
 }
 </style>

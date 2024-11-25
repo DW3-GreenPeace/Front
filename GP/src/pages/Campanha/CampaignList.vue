@@ -1,36 +1,25 @@
 <template>
   <div class="container">
     <h1>Lista de Campanhas</h1>
-    <div class="add-voltar">
-      <button @click="addCampaign" class="btn-add">Adicionar Campanha</button>
-      <button @click="backAdmin" class="btn-back">Voltar Para a Admistração</button>
-    </div>
-    
-    
-    <input 
-      type="text" 
-      v-model="searchQuery" 
-      @input="filterCampaigns" 
-      placeholder="Pesquisar Campanhas..." 
-      class="search-bar"
-    />
-    
+    <button @click="backAdmin" class="btn-back">Voltar Para a Administração</button>
     <table class="table">
       <thead>
         <tr>
-          <th>Título</th>
-          <th>Período</th>
+          <th>Nome</th>
+          <th>Data de Início</th>
+          <th>Endereço</th>
           <th>Ações</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="campaign in filteredCampaigns" :key="campaign.id">
+        <tr v-for="campaign in campaigns" :key="campaign.id">
           <td>{{ campaign.title }}</td>
-          <td>{{ campaign.startDate }} a {{ campaign.endDate }}</td>
+          <td>{{ formatDate(campaign.startDate) }}</td>
+          <td>{{ (campaign.address) }}</td>
           <td class="acoes">
-            <button @click="editCampaign(campaign.id)" class="btn-editar">Editar</button>
-            <button @click="viewDetails(campaign.id)" class="btn-detalhes">Ver Detalhes</button>
-            <button @click="deleteCampaign(campaign.id)" class="btn-excluir">Excluir</button>
+            <button class="btn-detalhes" @click="viewDetails(campaign.id)">Ver Detalhes</button>
+            <button class="btn-editar" @click="editCampaign(campaign.id)">Editar</button>
+            <button class="btn-excluir" @click="deleteCampaign(campaign.id)">Excluir</button>
           </td>
         </tr>
       </tbody>
@@ -38,48 +27,86 @@
   </div>
 </template>
 
-  
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted } from 'vue';
-import { Campaign } from '../../types/campaign';
-import { getCampaigns, deleteCampaign } from '../../services/campaignService';
+import { defineComponent, ref, onMounted } from 'vue';
+import axios from 'axios';
+import env from '../../../env'; // Certifique-se de configurar corretamente seu ambiente
 import { useRouter } from 'vue-router';
+
+interface Campaign {
+  id: string;
+  title: string;
+  startDate: number; // Data em timestamp
+  endDate: number; // Data em timestamp
+  address:string;
+}
 
 export default defineComponent({
   setup() {
     const campaigns = ref<Campaign[]>([]);
-    const searchQuery = ref("");
     const router = useRouter();
 
     const loadCampaigns = async () => {
-      campaigns.value = await getCampaigns();
+      try {
+        const response = await axios.get(`${env.url.local}/campaigns`, {
+          headers: { "ngrok-skip-browser-warning": "true" },
+          mode: "cors",
+        });
+        campaigns.value = response.data.data; // Ajuste conforme a estrutura do seu JSON
+      } catch (error) {
+        console.error('Erro ao buscar campanhas:', error);
+      }
     };
 
-    const filteredCampaigns = computed(() => {
-      return campaigns.value.filter(campaign =>
-        campaign.title.toLowerCase().includes(searchQuery.value.toLowerCase())
-      );
+    const formatDate = (timestamp: number): string => {
+      const date = new Date(timestamp);
+      return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    };
+
+    const viewDetails = (id: string) => {
+      router.push(`/campaigns/${id}`);
+    };
+
+    const editCampaign = (id: string) => {
+      router.push(`/campaigns/form/${id}`);
+    };
+
+    const deleteCampaign = async (id: string) => {
+      const confirmDelete = confirm('Tem certeza que deseja excluir esta campanha?');
+      if (confirmDelete) {
+        try {
+          await axios.delete(`${env.url.local}/campaigns/${id}`, {
+            headers: { "ngrok-skip-browser-warning": "true" },
+          });
+          // Remove a campanha da lista local sem recarregar a página
+          campaigns.value = campaigns.value.filter(campaign => campaign.id !== id);
+          alert('Campanha excluída com sucesso!');
+        } catch (error) {
+          console.error('Erro ao excluir campanha:', error);
+          alert('Erro ao excluir campanha.');
+        }
+      }
+    };
+
+    const backAdmin = () => router.push('/admin');
+
+    onMounted(() => {
+      loadCampaigns();
     });
 
-    const viewDetails = (id: number) => router.push(`/campanha/details/${id}`);
-    const addCampaign = () => router.push(`/admin/campanha/form`);
-    const backAdmin = () => router.push(`/admin`);
-    const editCampaign = (id: number) => router.push(`/admin/campaign/edit/${id}`);
-
-    const deleteCampaignById = async (id: number) => {
-      await deleteCampaign(id);
-      loadCampaigns();
+    return {
+      campaigns,
+      editCampaign, 
+      viewDetails,
+      deleteCampaign,
+      formatDate,
+      backAdmin,
     };
-
-    onMounted(loadCampaigns);
-
-    return { campaigns, searchQuery, filteredCampaigns, viewDetails, addCampaign, backAdmin, editCampaign, deleteCampaign: deleteCampaignById };
-  }
+  },
 });
 </script>
 
-  
-  <style scoped>
+<style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
 a,
@@ -92,6 +119,7 @@ span,
 td, th {
   font-family: "Poppins", serif;
 }
+
 .container {
   max-width: 80%;
   margin: 20px auto;
@@ -100,7 +128,11 @@ td, th {
   border-radius: 8px;
   /* box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); */
 }
-
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
 h1 {
   font-size: 24px;
   color: #4a90e2;
@@ -109,8 +141,10 @@ h1 {
 }
 
 .add-voltar{
+  width: 100%;
   display: flex;
-  align-items: center;
+  /* align-items: end; */
+  text-align: right;
   justify-content: space-between;
 }
 
@@ -150,6 +184,9 @@ h1 {
   padding: 12px;
   text-align: left;
   border: 1px solid #ddd;
+}
+.table td{
+  height: 7dvh;
 }
 
 .table th {

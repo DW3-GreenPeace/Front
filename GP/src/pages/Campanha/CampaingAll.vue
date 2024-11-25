@@ -1,147 +1,183 @@
 <template>
+  
+  <div class="campanhas-container">
     <Header />
-    <div class="container">
-      <div class="title">
-        <h1>Campanha Disponiveis</h1>
-        <p>Caso não apareca nenhum botão para participar da campanha, se cadastre como volutário
-          <!-- <a href="/register">Clique Aqui</a> -->
-          ou entra com sua conta
-        </p>
+    <h3>Campanhas Disponíveis</h3>
+    <div v-if="!isLoggedIn">
+      <p>Você precisa estar logado para se cadastrar em uma campanha.</p>
+    </div>
+    <div v-else>
+      <div v-if="campaigns.length === 0">
+        <p>Não há campanhas disponíveis no momento.</p>
       </div>
-      
-      
-      
-    <div class="campaign-list">
-      <div v-for="campaign in campaigns" :key="campaign.id" class="campaign-card">
-        <h2>{{ campaign.title }}</h2>
-        <p><strong>Descrição:</strong> {{ campaign.description }}</p>
-        <p><strong>Endereço:</strong> {{ campaign.address }}</p>
-        <p><strong>Data de Início:</strong> {{ campaign.startDate }}</p>
-        <p><strong>Data de Término:</strong> {{ campaign.endDate }}</p>
-        
-        <!-- Condição para exibir o botão apenas para usuários logados e voluntários -->
-        <button v-if="canJoin" @click="joinCampaign(campaign.id)">Participar da Campanha</button>
+      <div v-for="campaign in campaigns" :key="campaign.id" class="campanha-card">
+        <h4>{{ campaign.title }}</h4>
+        <p>{{ campaign.address }}</p>
+        <p>Início: {{ formatDate(campaign.startDate) }} | Fim: {{ formatDate(campaign.endDate) }}</p>
+        <button @click="registerForCampaign(campaign.id)" class="btn-register">Cadastrar</button>
       </div>
     </div>
   </div>
-  </template>
-  
-  <script lang="ts">
-  import { defineComponent, ref, onMounted, computed } from 'vue';
-  import { Campaign } from '../../types/campaign';
-  import { getCampaigns, joinCampaignById } from '../../services/campaignService';
-  // import isAuthenticated from '../../services/authService'
-  import Header from '../../components/Header.vue';
-  
-  export default defineComponent({
-    name: "CampaignList",
+</template>
 
-    components:{
-        Header
-    },
+<script lang="ts">
+import { defineComponent, ref, onMounted } from 'vue';
+import axios from 'axios';
+import env from '../../../env'; // Certifique-se de configurar corretamente seu ambiente
+import { useRouter } from 'vue-router';
+import Header from '../../components/Header.vue';
 
-    setup() {
-      const campaigns = ref<Campaign[]>([]);
-      const userId = ref<number | null>(null); // Armazena o ID do usuário logado
-  
-      // Função para carregar campanhas
-      const loadCampaigns = async () => {
-        campaigns.value = await getCampaigns();
-      };
-  
-      // Função para verificar se o usuário é voluntário e está autenticado
-      const canJoin = computed(() => isAuthenticated() && isVolunteer());
-  
-      // Função para participar da campanha
-      const joinCampaign = async (campaignId: number) => {
-        if (canJoin.value && userId.value !== null) {
-          await joinCampaignById(campaignId, { id: userId.value, name: "Nome do Voluntário", email: "email@exemplo.com" });
-          alert("Você se inscreveu na campanha com sucesso!");
-        } else {
-          alert("É necessário estar logado como voluntário para se inscrever.");
-        }
-      };
-  
-      onMounted(async () => {
-        await loadCampaigns();
-        // Recupera o ID do usuário logado, se ele estiver autenticado
-        if (isAuthenticated()) {
-          userId.value = 123; // Simule o ID do usuário, ou recupere-o de um serviço de autenticação
-        }
-      });
-  
-      return { campaigns, canJoin, joinCampaign };
-    }
-  });
-  </script>
-  
-  <style scoped>
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-
-a,
-h1,
-p,
-h2,
-h3,
-label,
-span,
-td, th {
-  font-family: "Poppins", serif;
+interface Campaign {
+  id: string;
+  title: string;
+  startDate: number; // Data em timestamp
+  endDate: number; // Data em timestamp
+  address: string;
 }
-  /* Estilos gerais */
-  .campaign-list {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    padding: 20px;
-  }
-  
-  .campaign-card {
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.3s;
-  }
-  
-  .title{
-    text-align: center  ;
-  }
-  .campaign-card:hover {
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-  }
-  
-  /* Cabeçalho da campanha */
-  h2 {
-    color: #333;
-    font-size: 22px;
-    margin-bottom: 10px;
-    border-bottom: 2px solid #4a90e2;
-    padding-bottom: 5px;
-  }
-  
-  p {
-    font-size: 16px;
-    color: #444;
-    margin: 8px 0;
-  }
-  
-  /* Botão de participar */
-  button {
-    margin-top: 15px;
-    padding: 10px 20px;
-    font-size: 16px;
-    font-weight: bold;
-    color: #fff;
-    background-color: #4a90e2;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  
-  button:hover {
-    background-color: #357ab8;
-  }
-  </style>
-  
+
+export default defineComponent({
+  components:{
+    Header,
+  },
+  setup() {
+    const campaigns = ref<Campaign[]>([]);
+    const isLoggedIn = ref(false);
+    const userName = ref('');
+    const router = useRouter();
+
+    // Verifica se o usuário está logado e obtém o nome do usuário
+    onMounted(() => {
+      const userId = localStorage.getItem('usuario');
+      if (userId) {
+        isLoggedIn.value = true;
+        userName.value = localStorage.getItem('user_name') || '';  // Recupera o nome do usuário
+        loadCampaigns();
+      }
+    });
+
+    // Função para carregar as campanhas
+    const loadCampaigns = async () => {
+      try {
+        const response = await axios.get(`${env.url.local}/campaigns`, {
+          headers: { "ngrok-skip-browser-warning": "true" },
+          mode: "cors",
+        });
+        campaigns.value = response.data.data; // Ajuste conforme a estrutura do seu JSON
+      } catch (error) {
+        console.error('Erro ao buscar campanhas:', error);
+      }
+    };
+
+    // Função para formatar a data no formato desejado
+    const formatDate = (timestamp: number): string => {
+      const date = new Date(timestamp);
+      return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    };
+
+    // Função para registrar o usuário na campanha
+    const registerForCampaign = async (campaignId: string) => {
+      if (!userName.value) {
+        console.error('Usuário não encontrado.');
+        return;
+      }
+
+      try {
+        const response = await axios.post(`${env.url.local}/register-campaign`, {
+          userName: userName.value,
+          campaignId: campaignId,
+        });
+
+        if (response.data.success) {
+          alert('Cadastro realizado com sucesso!');
+        } else {
+          alert('Erro ao se cadastrar na campanha.');
+        }
+      } catch (error) {
+        console.error('Erro ao se cadastrar na campanha:', error);
+        alert('Erro ao se cadastrar na campanha.');
+      }
+    };
+
+    // Função para visualizar detalhes da campanha
+    const viewDetails = (id: string) => {
+      router.push(`/campaigns/${id}`);
+    };
+
+    // Função para editar a campanha
+    const editCampaign = (id: string) => {
+      router.push(`/campaigns/form/${id}`);
+    };
+
+    // Função para excluir a campanha
+    const deleteCampaign = async (id: string) => {
+      const confirmDelete = confirm('Tem certeza que deseja excluir esta campanha?');
+      if (confirmDelete) {
+        try {
+          await axios.delete(`${env.url.local}/campaigns/${id}`, {
+            headers: { "ngrok-skip-browser-warning": "true" },
+          });
+          // Remove a campanha da lista local sem recarregar a página
+          campaigns.value = campaigns.value.filter(campaign => campaign.id !== id);
+          alert('Campanha excluída com sucesso!');
+        } catch (error) {
+          console.error('Erro ao excluir campanha:', error);
+          alert('Erro ao excluir campanha.');
+        }
+      }
+    };
+
+    // Função para voltar à página de administração
+    const backAdmin = () => router.push('/admin');
+
+    return {
+      campaigns,
+      isLoggedIn,
+      userName,
+      editCampaign,
+      viewDetails,
+      deleteCampaign,
+      registerForCampaign,
+      formatDate,
+      backAdmin,
+    };
+  },
+});
+</script>
+
+<style scoped>
+.campanhas-container {
+  max-width: 100%;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.campanha-card {
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.campanha-card h4 {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+.campanha-card p {
+  margin-bottom: 10px;
+}
+
+.btn-register {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-register:hover {
+  background-color: #45a049;
+}
+</style>
